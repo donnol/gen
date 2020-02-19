@@ -1,6 +1,10 @@
 package testdata
 
-import "time"
+import (
+	"time"
+
+	"github.com/pkg/errors"
+)
 
 // Model 模型
 type Model struct {
@@ -19,8 +23,13 @@ type Model struct {
 	// 默认1.0
 	Height float64 // 高度
 
+	// 列表
+	Addrs []errors.Frame // 地址
+
 	// 知时知地知人知物
 	CreatedAt time.Time // 创建时间
+
+	Err errors.Frame
 }
 
 // Status 状态
