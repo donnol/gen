@@ -165,32 +165,13 @@ func (p *Parser) getStructFromPkgScope(
 
 		// 为结果赋值
 		tmp := Struct{}
-		tmp.Name = obj.Name()
-		tmp.TypesType = objType
-		tmp.Type = objType.String()
-		tmp.UnderType = objStruct.Underlying().String()
-		tmp.ImportPath = typPkg.Path()
-		_, typName, typNameWithPath := p.getImportPathAndTypeName(objType.String())
-		tmp.TypName = typName
-		tmp.TypNameWithPath = typNameWithPath
-		tmp.Doc = docMap[obj.Name()]
+		tmp.Info.InitWithTypes(obj.Name(), typPkg.Path(), docMap[obj.Name()], "", objType)
+		// 字段
 		for i := 0; i < objStruct.NumFields(); i++ {
 			field := objStruct.Field(i)
-			importPath, typName, typNameWithPath := p.getImportPathAndTypeName(field.Type().String())
-			tmpField := Field{
-				Info: Info{
-					Name:            field.Name(),
-					TypesType:       field.Type(),
-					Type:            field.Type().String(),
-					UnderType:       field.Type().Underlying().String(),
-					ImportPath:      importPath,
-					TypName:         typName,
-					TypNameWithPath: typNameWithPath,
-				},
-			}
 			key := p.getStructDocAndCommentMapKey(obj.Name(), field.Name())
-			tmpField.Doc = docMap[key]
-			tmpField.Comment = commentMap[key]
+			tmpField := Field{}
+			tmpField.Info.InitWithTypes(field.Name(), "", docMap[key], commentMap[key], field.Type())
 			tmp.Fields = append(tmp.Fields, tmpField)
 		}
 
@@ -198,29 +179,4 @@ func (p *Parser) getStructFromPkgScope(
 	}
 
 	return result
-}
-
-// FIXME:这里使用字符串解析不太好，还是应该使用go/types包里的方法来获取信息为好
-func (p *Parser) getImportPathAndTypeName(full string) (string, string, string) {
-	var importPath, typeName, typNameWithPath string
-
-	typeName = full
-	typNameWithPath = full
-	typLastIndex := strings.LastIndex(full, ".")
-	if typLastIndex != -1 {
-		typeName = full[typLastIndex+1:]
-		slashLastIndex := strings.LastIndex(full, "/")
-		if slashLastIndex != -1 {
-			typNameWithPath = typNameWithPath[slashLastIndex+1:]
-		}
-		importPath = full[:typLastIndex]
-		listIndex := strings.Index(importPath, "[]")
-		if listIndex == 0 {
-			importPath = importPath[2:]
-			typeName = "[]" + typeName
-			typNameWithPath = "[]" + typNameWithPath
-		}
-	}
-
-	return importPath, typeName, typNameWithPath
 }
