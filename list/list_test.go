@@ -15,6 +15,7 @@ func TestList(t *testing.T) {
 		pkg string
 	}{
 		{"github.com/donnol/gen/parser"},
+		{"github.com/donnol/gen/list/testdata"},
 	} {
 		err := list.Parse(cas.pkg)
 		if err != nil {

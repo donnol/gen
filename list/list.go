@@ -39,7 +39,7 @@ func (list *List) Parse(importPath string) error {
 	}
 
 	// 写入，添加包名和依赖导入
-	importPaths := ImportPathMap(importPathMap).Keys()
+	importPaths := parser.ImportPathMap(importPathMap).Keys()
 	importPaths = filter(importPaths, pkg.ImportPath)
 	fileContent := list.template.SpliceFile(template.FileOption{
 		PkgName:     pkgName,
@@ -54,44 +54,33 @@ func (list *List) Parse(importPath string) error {
 	return nil
 }
 
-func (list *List) output(pkg parser.Pkg) (string, map[string][]string, []byte, error) {
+func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, error) {
 	var pkgName = pkg.Name
-	var importPathMap = make(map[string][]string)
+	var importPathMap = make(parser.ImportPathMap)
 	var content []byte
 
 	var buf = bytes.NewBuffer(content)
 	for _, singleStruct := range pkg.Structs {
-		importPath := singleStruct.ImportPath
-		if importPath != "" {
-			importPathMap[importPath] = append(importPathMap[importPath], singleStruct.TypNameWithPath)
-		}
+		importPathMap = importPathMap.MergeKey(
+			singleStruct.Info.GetNotEmptyImportPathMap())
 
-		typNameWithPath := singleStruct.TypNameWithPath
-		if singleStruct.ImportPath == pkg.ImportPath {
-			typNameWithPath = singleStruct.TypName
-		}
+		structName := singleStruct.Name
+		typNameWithPath := singleStruct.Info.GetTypNameWithPath(pkg.ImportPath)
 		if err := list.template.Execute(buf, "List", typText, map[string]interface{}{
-			"typName":         singleStruct.Name,
+			"typName":         structName,
 			"typNameWithPath": typNameWithPath,
 		}); err != nil {
 			return pkgName, importPathMap, content, errors.WithStack(err)
 		}
 
 		for _, singleField := range singleStruct.Fields {
-			importPath := singleField.ImportPath
-			if importPath != "" {
-				importPathMap[importPath] = append(importPathMap[importPath], singleField.TypNameWithPath)
-			}
+			importPathMap = importPathMap.MergeKey(singleField.Info.GetNotEmptyImportPathMap())
 
-			typNameWithPath := singleField.TypNameWithPath
-			if singleField.ImportPath == pkg.ImportPath {
-				typNameWithPath = singleField.TypName
-			}
+			typNameWithPath := singleField.Info.GetTypNameWithPath(pkg.ImportPath)
 			if err := list.template.Execute(buf, "List", columnMethodText, map[string]interface{}{
-				"typName":         singleStruct.Name,
-				"typNameWithPath": singleStruct.TypNameWithPath,
-				"fieldName":       singleField.Name,
-				"fieldType":       typNameWithPath,
+				"typName":   structName,
+				"fieldName": singleField.Name,
+				"fieldType": typNameWithPath,
 			}); err != nil {
 				return pkgName, importPathMap, content, errors.WithStack(err)
 			}
@@ -106,18 +95,6 @@ func (list *List) getFileName(pkgDir, pkgName string) string {
 	filename := fmt.Sprintf("%s_list.go", pkgName)
 	filename = filepath.Join(pkgDir, filename)
 	return filename
-}
-
-// ImportPathMap 路径映射
-type ImportPathMap map[string][]string
-
-// Keys 键
-func (m ImportPathMap) Keys() []string {
-	keys := make([]string, 0, len(m))
-	for key := range m {
-		keys = append(keys, key)
-	}
-	return keys
 }
 
 func filter(keys []string, s string) []string {
