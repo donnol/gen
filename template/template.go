@@ -2,13 +2,13 @@ package template
 
 import (
 	"fmt"
-	"go/format"
 	"io"
 	"io/ioutil"
 	"os"
 	"text/template"
 
 	"github.com/pkg/errors"
+	"golang.org/x/tools/imports"
 )
 
 // Template 模板，用于生成和格式化文件
@@ -57,8 +57,8 @@ func (temp *Template) SpliceFile(opt FileOption) string {
 
 // WriteFile 写文件
 func (temp *Template) WriteFile(filename string, content []byte) error {
-	// 写入前先format
-	formatContent, err := format.Source(content)
+	// 写入前先format，并导包
+	formatContent, err := imports.Process(filename, content, &imports.Options{})
 	if err != nil {
 		return errors.WithMessagef(err, "%s", content)
 	}
