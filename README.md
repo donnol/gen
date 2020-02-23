@@ -1,5 +1,8 @@
 # gen
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/donnol/gen)](https://goreportcard.com/report/github.com/donnol/gen)
+[![GoDoc](https://pkg.go.dev/mod/github.com/donnol/gen?status.svg)](https://pkg.go.dev/mod/github.com/donnol/gen)
+
 生成。
 
 ## 为什么
