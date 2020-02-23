@@ -7,7 +7,7 @@ import (
 
 	"github.com/donnol/gen/parser"
 	"github.com/donnol/gen/template"
-	utillist "github.com/donnol/gen/utils/list"
+	toollist "github.com/donnol/tools/list"
 	"github.com/pkg/errors"
 )
 
@@ -41,7 +41,7 @@ func (list *List) Parse(importPath string) error {
 
 	// 写入，添加包名和依赖导入
 	importPaths := parser.ImportPathMap(importPathMap).Keys()
-	importPaths = utillist.Filter(importPaths, pkg.ImportPath)
+	importPaths = toollist.Filter(importPaths, pkg.ImportPath)
 	fileContent := list.template.SpliceFile(template.FileOption{
 		PkgName:     pkgName,
 		ImportPaths: importPaths,
