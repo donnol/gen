@@ -7,6 +7,7 @@ import (
 
 	"github.com/donnol/gen/parser"
 	"github.com/donnol/gen/template"
+	utillist "github.com/donnol/gen/utils/list"
 	"github.com/pkg/errors"
 )
 
@@ -40,7 +41,7 @@ func (list *List) Parse(importPath string) error {
 
 	// 写入，添加包名和依赖导入
 	importPaths := parser.ImportPathMap(importPathMap).Keys()
-	importPaths = filter(importPaths, pkg.ImportPath)
+	importPaths = utillist.Filter(importPaths, pkg.ImportPath)
 	fileContent := list.template.SpliceFile(template.FileOption{
 		PkgName:     pkgName,
 		ImportPaths: importPaths,
@@ -95,15 +96,4 @@ func (list *List) getFileName(pkgDir, pkgName string) string {
 	filename := fmt.Sprintf("%s_list.go", pkgName)
 	filename = filepath.Join(pkgDir, filename)
 	return filename
-}
-
-func filter(keys []string, s string) []string {
-	newKeys := make([]string, 0, len(keys))
-	for _, key := range keys {
-		if key == s {
-			continue
-		}
-		newKeys = append(newKeys, key)
-	}
-	return newKeys
 }
