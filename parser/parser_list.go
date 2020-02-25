@@ -22,6 +22,14 @@ func (list FieldList) MapInfo() map[Info]Field {
 	return result
 }
 
+func (list FieldList) MapListByInfo() map[Info][]Field {
+	result := make(map[Info][]Field)
+	for _, single := range list {
+		result[single.Info] = append(result[single.Info], single)
+	}
+	return result
+}
+
 type InfoList []Info
 
 func (list InfoList) ColumnName() []string {
@@ -36,6 +44,14 @@ func (list InfoList) MapName() map[string]Info {
 	result := make(map[string]Info)
 	for _, single := range list {
 		result[single.Name] = single
+	}
+	return result
+}
+
+func (list InfoList) MapListByName() map[string][]Info {
+	result := make(map[string][]Info)
+	for _, single := range list {
+		result[single.Name] = append(result[single.Name], single)
 	}
 	return result
 }
@@ -56,6 +72,14 @@ func (list InfoList) MapTypesType() map[types.Type]Info {
 	return result
 }
 
+func (list InfoList) MapListByTypesType() map[types.Type][]Info {
+	result := make(map[types.Type][]Info)
+	for _, single := range list {
+		result[single.TypesType] = append(result[single.TypesType], single)
+	}
+	return result
+}
+
 func (list InfoList) ColumnType() []string {
 	result := make([]string, len(list), len(list))
 	for i, single := range list {
@@ -68,6 +92,14 @@ func (list InfoList) MapType() map[string]Info {
 	result := make(map[string]Info)
 	for _, single := range list {
 		result[single.Type] = single
+	}
+	return result
+}
+
+func (list InfoList) MapListByType() map[string][]Info {
+	result := make(map[string][]Info)
+	for _, single := range list {
+		result[single.Type] = append(result[single.Type], single)
 	}
 	return result
 }
@@ -88,6 +120,14 @@ func (list InfoList) MapUnderType() map[string]Info {
 	return result
 }
 
+func (list InfoList) MapListByUnderType() map[string][]Info {
+	result := make(map[string][]Info)
+	for _, single := range list {
+		result[single.UnderType] = append(result[single.UnderType], single)
+	}
+	return result
+}
+
 func (list InfoList) ColumnImportPath() []string {
 	result := make([]string, len(list), len(list))
 	for i, single := range list {
@@ -100,6 +140,14 @@ func (list InfoList) MapImportPath() map[string]Info {
 	result := make(map[string]Info)
 	for _, single := range list {
 		result[single.ImportPath] = single
+	}
+	return result
+}
+
+func (list InfoList) MapListByImportPath() map[string][]Info {
+	result := make(map[string][]Info)
+	for _, single := range list {
+		result[single.ImportPath] = append(result[single.ImportPath], single)
 	}
 	return result
 }
@@ -120,6 +168,14 @@ func (list InfoList) MapTypName() map[string]Info {
 	return result
 }
 
+func (list InfoList) MapListByTypName() map[string][]Info {
+	result := make(map[string][]Info)
+	for _, single := range list {
+		result[single.TypName] = append(result[single.TypName], single)
+	}
+	return result
+}
+
 func (list InfoList) ColumnTypNameWithPath() []string {
 	result := make([]string, len(list), len(list))
 	for i, single := range list {
@@ -132,6 +188,14 @@ func (list InfoList) MapTypNameWithPath() map[string]Info {
 	result := make(map[string]Info)
 	for _, single := range list {
 		result[single.TypNameWithPath] = single
+	}
+	return result
+}
+
+func (list InfoList) MapListByTypNameWithPath() map[string][]Info {
+	result := make(map[string][]Info)
+	for _, single := range list {
+		result[single.TypNameWithPath] = append(result[single.TypNameWithPath], single)
 	}
 	return result
 }
@@ -152,6 +216,14 @@ func (list InfoList) MapCanUseAsMapKey() map[bool]Info {
 	return result
 }
 
+func (list InfoList) MapListByCanUseAsMapKey() map[bool][]Info {
+	result := make(map[bool][]Info)
+	for _, single := range list {
+		result[single.CanUseAsMapKey] = append(result[single.CanUseAsMapKey], single)
+	}
+	return result
+}
+
 func (list InfoList) ColumnComment() []string {
 	result := make([]string, len(list), len(list))
 	for i, single := range list {
@@ -168,6 +240,14 @@ func (list InfoList) MapComment() map[string]Info {
 	return result
 }
 
+func (list InfoList) MapListByComment() map[string][]Info {
+	result := make(map[string][]Info)
+	for _, single := range list {
+		result[single.Comment] = append(result[single.Comment], single)
+	}
+	return result
+}
+
 func (list InfoList) ColumnDoc() []string {
 	result := make([]string, len(list), len(list))
 	for i, single := range list {
@@ -180,6 +260,14 @@ func (list InfoList) MapDoc() map[string]Info {
 	result := make(map[string]Info)
 	for _, single := range list {
 		result[single.Doc] = single
+	}
+	return result
+}
+
+func (list InfoList) MapListByDoc() map[string][]Info {
+	result := make(map[string][]Info)
+	for _, single := range list {
+		result[single.Doc] = append(result[single.Doc], single)
 	}
 	return result
 }
@@ -206,6 +294,14 @@ func (list PkgList) MapName() map[string]Pkg {
 	return result
 }
 
+func (list PkgList) MapListByName() map[string][]Pkg {
+	result := make(map[string][]Pkg)
+	for _, single := range list {
+		result[single.Name] = append(result[single.Name], single)
+	}
+	return result
+}
+
 func (list PkgList) ColumnDir() []string {
 	result := make([]string, len(list), len(list))
 	for i, single := range list {
@@ -222,6 +318,14 @@ func (list PkgList) MapDir() map[string]Pkg {
 	return result
 }
 
+func (list PkgList) MapListByDir() map[string][]Pkg {
+	result := make(map[string][]Pkg)
+	for _, single := range list {
+		result[single.Dir] = append(result[single.Dir], single)
+	}
+	return result
+}
+
 func (list PkgList) ColumnImportPath() []string {
 	result := make([]string, len(list), len(list))
 	for i, single := range list {
@@ -234,6 +338,14 @@ func (list PkgList) MapImportPath() map[string]Pkg {
 	result := make(map[string]Pkg)
 	for _, single := range list {
 		result[single.ImportPath] = single
+	}
+	return result
+}
+
+func (list PkgList) MapListByImportPath() map[string][]Pkg {
+	result := make(map[string][]Pkg)
+	for _, single := range list {
+		result[single.ImportPath] = append(result[single.ImportPath], single)
 	}
 	return result
 }
@@ -260,6 +372,14 @@ func (list StructList) MapInfo() map[Info]Struct {
 	result := make(map[Info]Struct)
 	for _, single := range list {
 		result[single.Info] = single
+	}
+	return result
+}
+
+func (list StructList) MapListByInfo() map[Info][]Struct {
+	result := make(map[Info][]Struct)
+	for _, single := range list {
+		result[single.Info] = append(result[single.Info], single)
 	}
 	return result
 }

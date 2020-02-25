@@ -24,6 +24,14 @@ func (list ModelList) MapID() map[int]Model {
 	return result
 }
 
+func (list ModelList) MapListByID() map[int][]Model {
+	result := make(map[int][]Model)
+	for _, single := range list {
+		result[single.ID] = append(result[single.ID], single)
+	}
+	return result
+}
+
 func (list ModelList) ColumnName() []string {
 	result := make([]string, len(list), len(list))
 	for i, single := range list {
@@ -36,6 +44,14 @@ func (list ModelList) MapName() map[string]Model {
 	result := make(map[string]Model)
 	for _, single := range list {
 		result[single.Name] = single
+	}
+	return result
+}
+
+func (list ModelList) MapListByName() map[string][]Model {
+	result := make(map[string][]Model)
+	for _, single := range list {
+		result[single.Name] = append(result[single.Name], single)
 	}
 	return result
 }

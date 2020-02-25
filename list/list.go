@@ -88,15 +88,20 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 			}); err != nil {
 				return pkgName, importPathMap, content, errors.WithStack(err)
 			}
-			// 列取映射
+			// 映射
 			if singleField.Info.CanUseAsMapKey {
-				if err := list.template.Execute(buf, "List", mapMethodText, map[string]interface{}{
-					"typName":         structName,
-					"typNameWithPath": typNameWithPath,
-					"fieldName":       fieldName,
-					"fieldType":       fieldTypNameWithPath,
-				}); err != nil {
-					return pkgName, importPathMap, content, errors.WithStack(err)
+				for _, methodText := range []string{
+					mapMethodText,      // 列取映射
+					sliceMapMethodText, // 列取数组映射
+				} {
+					if err := list.template.Execute(buf, "List", methodText, map[string]interface{}{
+						"typName":         structName,
+						"typNameWithPath": typNameWithPath,
+						"fieldName":       fieldName,
+						"fieldType":       fieldTypNameWithPath,
+					}); err != nil {
+						return pkgName, importPathMap, content, errors.WithStack(err)
+					}
 				}
 			}
 		}

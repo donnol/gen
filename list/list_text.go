@@ -29,3 +29,15 @@ var mapMethodText = `
 		return result
 	}
 	`
+
+// 列取数组映射方法定义
+var sliceMapMethodText = `
+	// MapListBy{{.fieldName}} {{.fieldName}}数组映射
+	func (list {{.typName}}List) MapListBy{{.fieldName}}() map[{{.fieldType}}][]{{.typNameWithPath}} {
+		result := make(map[{{.fieldType}}][]{{.typNameWithPath}})
+		for _, single := range list {
+			result[single.{{.fieldName}}] = append(result[single.{{.fieldName}}], single)
+		}
+		return result
+	}
+	`
