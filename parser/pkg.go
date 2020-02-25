@@ -43,6 +43,7 @@ type Info struct {
 	ImportPath      string // 导入路径
 	TypName         string // 类型名，如果是结构体则与Name相同，如果是字段，则是字段的类型
 	TypNameWithPath string // 带有导入路径的类型名称，如：parser.Info
+	CanUseAsMapKey  bool   // 字段类型是否可作为map的键
 
 	Comment string // 注释
 	Doc     string // 文档
@@ -93,6 +94,7 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 	string,
 ) {
 	importPath, typeName, typNameWithPath := getImportPathAndTypeName(full)
+	canUseAsMapKey := true
 
 	switch v := info.TypesType.(type) {
 	case *types.Array:
@@ -103,6 +105,8 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		prefix := "[" + strconv.Itoa(int(v.Len())) + "]"
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
+
+		canUseAsMapKey = false
 	case *types.Basic:
 		debug("Basic: %+v, %+v\n", v, v.Info())
 
@@ -114,6 +118,8 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		prefix := "chan "
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
+
+		canUseAsMapKey = false
 	case *types.Interface:
 		debug("Interface: %+v, %+v\n", v, v.NumMethods())
 
@@ -126,6 +132,8 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		prefix := "map[" + keyTypNameWithPath + "] "
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
+
+		canUseAsMapKey = false
 	case *types.Named:
 		debug("Named: %+v, %+v\n", v, v.NumMethods())
 
@@ -137,6 +145,8 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		prefix := "*"
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
+
+		canUseAsMapKey = false
 	case *types.Signature:
 		debug("Signature: %+v, %+v\n", v, v.Params())
 
@@ -148,6 +158,8 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		prefix := "[]"
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
+
+		canUseAsMapKey = false
 	case *types.Struct:
 		debug("Struct: %+v, %+v\n", v, v.NumFields())
 
@@ -155,6 +167,8 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		debug("Tuple: %+v, %+v\n", v, v.Len())
 
 	}
+
+	info.CanUseAsMapKey = canUseAsMapKey
 
 	return importPath, typeName, typNameWithPath
 }
