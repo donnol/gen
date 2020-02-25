@@ -77,13 +77,27 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 		for _, singleField := range singleStruct.Fields {
 			importPathMap = importPathMap.MergeKey(singleField.Info.GetNotEmptyImportPathMap())
 
-			typNameWithPath := singleField.Info.GetTypNameWithPath(pkg.ImportPath)
+			fieldName := singleField.Name
+			fieldTypNameWithPath := singleField.Info.GetTypNameWithPath(pkg.ImportPath)
+
+			// 取列
 			if err := list.template.Execute(buf, "List", columnMethodText, map[string]interface{}{
 				"typName":   structName,
-				"fieldName": singleField.Name,
-				"fieldType": typNameWithPath,
+				"fieldName": fieldName,
+				"fieldType": fieldTypNameWithPath,
 			}); err != nil {
 				return pkgName, importPathMap, content, errors.WithStack(err)
+			}
+			// 列取映射
+			if singleField.Info.CanUseAsMapKey {
+				if err := list.template.Execute(buf, "List", mapMethodText, map[string]interface{}{
+					"typName":         structName,
+					"typNameWithPath": typNameWithPath,
+					"fieldName":       fieldName,
+					"fieldType":       fieldTypNameWithPath,
+				}); err != nil {
+					return pkgName, importPathMap, content, errors.WithStack(err)
+				}
 			}
 		}
 	}

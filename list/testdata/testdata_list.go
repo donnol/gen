@@ -16,10 +16,26 @@ func (list ModelList) ColumnID() []int {
 	return result
 }
 
+func (list ModelList) MapID() map[int]Model {
+	result := make(map[int]Model)
+	for _, single := range list {
+		result[single.ID] = single
+	}
+	return result
+}
+
 func (list ModelList) ColumnName() []string {
 	result := make([]string, len(list), len(list))
 	for i, single := range list {
 		result[i] = single.Name
+	}
+	return result
+}
+
+func (list ModelList) MapName() map[string]Model {
+	result := make(map[string]Model)
+	for _, single := range list {
+		result[single.Name] = single
 	}
 	return result
 }
