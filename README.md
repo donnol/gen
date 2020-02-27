@@ -16,10 +16,11 @@
 安装工具`gen`:
 
 ```sh
-# TODO:暂未实现
+# 暂未实现
 go get -u github.com/donnol/gen/cmd/gen
 ```
 
+TODO:标记解析
 先要在写结构体的时候在文档做好标志(写的时候请忽略标记后的说明)，如下：
 
 ```go
