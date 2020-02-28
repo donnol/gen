@@ -58,6 +58,7 @@ func (info *Info) InitWithTypes(name, pkgPath, doc, comment string, typ types.Ty
 	info.ImportPath = pkgPath
 	info.Doc = doc
 	info.Comment = comment
+	info.CanUseAsMapKey = types.Comparable(info.TypesType)
 
 	// 路径等信息
 	importPath, typName, typNameWithPath := info.GetImportPathAndTypeName(typ.String())
@@ -94,7 +95,6 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 	string,
 ) {
 	importPath, typeName, typNameWithPath := getImportPathAndTypeName(full)
-	canUseAsMapKey := true
 
 	switch v := info.TypesType.(type) {
 	case *types.Array:
@@ -106,7 +106,6 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
 
-		canUseAsMapKey = false
 	case *types.Basic:
 		debug("Basic: %+v, %+v\n", v, v.Info())
 
@@ -119,7 +118,6 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
 
-		canUseAsMapKey = false
 	case *types.Interface:
 		debug("Interface: %+v, %+v\n", v, v.NumMethods())
 
@@ -133,7 +131,6 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
 
-		canUseAsMapKey = false
 	case *types.Named:
 		debug("Named: %+v, %+v\n", v, v.NumMethods())
 
@@ -146,7 +143,6 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
 
-		canUseAsMapKey = false
 	case *types.Signature:
 		debug("Signature: %+v, %+v\n", v, v.Params())
 
@@ -159,7 +155,6 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
 
-		canUseAsMapKey = false
 	case *types.Struct:
 		debug("Struct: %+v, %+v\n", v, v.NumFields())
 
@@ -167,8 +162,6 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 		debug("Tuple: %+v, %+v\n", v, v.Len())
 
 	}
-
-	info.CanUseAsMapKey = canUseAsMapKey
 
 	return importPath, typeName, typNameWithPath
 }

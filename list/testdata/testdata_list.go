@@ -64,10 +64,42 @@ func (list ModelList) ColumnArray() [][4]int {
 	return result
 }
 
+func (list ModelList) MapArray() map[[4]int]Model {
+	result := make(map[[4]int]Model)
+	for _, single := range list {
+		result[single.Array] = single
+	}
+	return result
+}
+
+func (list ModelList) MapListByArray() map[[4]int][]Model {
+	result := make(map[[4]int][]Model)
+	for _, single := range list {
+		result[single.Array] = append(result[single.Array], single)
+	}
+	return result
+}
+
 func (list ModelList) ColumnChan() []chan int {
 	result := make([]chan int, len(list), len(list))
 	for i, single := range list {
 		result[i] = single.Chan
+	}
+	return result
+}
+
+func (list ModelList) MapChan() map[chan int]Model {
+	result := make(map[chan int]Model)
+	for _, single := range list {
+		result[single.Chan] = single
+	}
+	return result
+}
+
+func (list ModelList) MapListByChan() map[chan int][]Model {
+	result := make(map[chan int][]Model)
+	for _, single := range list {
+		result[single.Chan] = append(result[single.Chan], single)
 	}
 	return result
 }
@@ -88,6 +120,22 @@ func (list ModelList) ColumnPointer() []*int {
 	return result
 }
 
+func (list ModelList) MapPointer() map[*int]Model {
+	result := make(map[*int]Model)
+	for _, single := range list {
+		result[single.Pointer] = single
+	}
+	return result
+}
+
+func (list ModelList) MapListByPointer() map[*int][]Model {
+	result := make(map[*int][]Model)
+	for _, single := range list {
+		result[single.Pointer] = append(result[single.Pointer], single)
+	}
+	return result
+}
+
 func (list ModelList) ColumnSlice() [][]int {
 	result := make([][]int, len(list), len(list))
 	for i, single := range list {
@@ -104,10 +152,42 @@ func (list ModelList) ColumnOutArray() [][4]errors.Frame {
 	return result
 }
 
+func (list ModelList) MapOutArray() map[[4]errors.Frame]Model {
+	result := make(map[[4]errors.Frame]Model)
+	for _, single := range list {
+		result[single.OutArray] = single
+	}
+	return result
+}
+
+func (list ModelList) MapListByOutArray() map[[4]errors.Frame][]Model {
+	result := make(map[[4]errors.Frame][]Model)
+	for _, single := range list {
+		result[single.OutArray] = append(result[single.OutArray], single)
+	}
+	return result
+}
+
 func (list ModelList) ColumnOutChan() []chan errors.Frame {
 	result := make([]chan errors.Frame, len(list), len(list))
 	for i, single := range list {
 		result[i] = single.OutChan
+	}
+	return result
+}
+
+func (list ModelList) MapOutChan() map[chan errors.Frame]Model {
+	result := make(map[chan errors.Frame]Model)
+	for _, single := range list {
+		result[single.OutChan] = single
+	}
+	return result
+}
+
+func (list ModelList) MapListByOutChan() map[chan errors.Frame][]Model {
+	result := make(map[chan errors.Frame][]Model)
+	for _, single := range list {
+		result[single.OutChan] = append(result[single.OutChan], single)
 	}
 	return result
 }
@@ -140,6 +220,22 @@ func (list ModelList) ColumnOutPointer() []*errors.Frame {
 	result := make([]*errors.Frame, len(list), len(list))
 	for i, single := range list {
 		result[i] = single.OutPointer
+	}
+	return result
+}
+
+func (list ModelList) MapOutPointer() map[*errors.Frame]Model {
+	result := make(map[*errors.Frame]Model)
+	for _, single := range list {
+		result[single.OutPointer] = single
+	}
+	return result
+}
+
+func (list ModelList) MapListByOutPointer() map[*errors.Frame][]Model {
+	result := make(map[*errors.Frame][]Model)
+	for _, single := range list {
+		result[single.OutPointer] = append(result[single.OutPointer], single)
 	}
 	return result
 }
