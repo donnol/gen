@@ -39,9 +39,12 @@ func main() {
 	fmt.Printf("modPath: %s\n", modPath)
 
 	// 获取模块里的所有包
-	allPkgPath := []string{}
+	allPkgPath := []string{modPath}
 	if *rFlag {
 		if err := filepath.Walk(dir, filepath.WalkFunc(func(path string, info os.FileInfo, err error) error {
+			if path == dir {
+				return nil
+			}
 			// 获取所需目录
 			if info.IsDir() && !strings.Contains(path, ".git") {
 				// 替换系统目录为包路径
@@ -57,6 +60,7 @@ func main() {
 	}
 
 	// 生成代码
+	var pkgNum int
 	for _, pkgPath := range allPkgPath {
 		p := parser.New()
 		t := &template.Template{}
@@ -66,7 +70,9 @@ func main() {
 			fmt.Printf("%v\n", err)
 			continue
 		}
+		pkgNum++
 	}
 
 	// 结果统计
+	fmt.Printf("Job done: %d/%d\n", pkgNum, len(allPkgPath))
 }
