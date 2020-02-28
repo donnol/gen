@@ -47,6 +47,8 @@ type Info struct {
 
 	Comment string // 注释
 	Doc     string // 文档
+
+	Commands []string // 指令，如list, list column, list map, list slicemap等中的一个或多个
 }
 
 // InitWithTypes 初始化

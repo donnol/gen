@@ -14,22 +14,6 @@ func (list FieldList) ColumnInfo() []Info {
 	return result
 }
 
-func (list FieldList) MapInfo() map[Info]Field {
-	result := make(map[Info]Field)
-	for _, single := range list {
-		result[single.Info] = single
-	}
-	return result
-}
-
-func (list FieldList) MapListByInfo() map[Info][]Field {
-	result := make(map[Info][]Field)
-	for _, single := range list {
-		result[single.Info] = append(result[single.Info], single)
-	}
-	return result
-}
-
 type InfoList []Info
 
 func (list InfoList) ColumnName() []string {
@@ -272,6 +256,14 @@ func (list InfoList) MapListByDoc() map[string][]Info {
 	return result
 }
 
+func (list InfoList) ColumnCommands() [][]string {
+	result := make([][]string, len(list), len(list))
+	for i, single := range list {
+		result[i] = single.Commands
+	}
+	return result
+}
+
 type OptionList []Option
 
 type ParserList []Parser
@@ -364,22 +356,6 @@ func (list StructList) ColumnInfo() []Info {
 	result := make([]Info, len(list), len(list))
 	for i, single := range list {
 		result[i] = single.Info
-	}
-	return result
-}
-
-func (list StructList) MapInfo() map[Info]Struct {
-	result := make(map[Info]Struct)
-	for _, single := range list {
-		result[single.Info] = single
-	}
-	return result
-}
-
-func (list StructList) MapListByInfo() map[Info][]Struct {
-	result := make(map[Info][]Struct)
-	for _, single := range list {
-		result[single.Info] = append(result[single.Info], single)
 	}
 	return result
 }
