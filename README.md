@@ -19,7 +19,6 @@
 go get -u github.com/donnol/gen/cmd/gen
 ```
 
-TODO:标记解析
 先要在写结构体的时候在文档做好标志(写的时候请忽略标记后的说明)，如下：
 
 ```go
@@ -32,6 +31,8 @@ type Model struct {
 
     // @gen list map: 表示要取Name列映射
     // @gen list slicemap: 表示要取Name列的数组映射
+    // @gen list [map, slicemap]: 多个写在一起
+    // @gen list [map, slicemap]; xxx [xxx, xxx]: 如果后面有多种指令，使用这个格式(NOTE:未实现)
     Name string // 名称
 
     Old bool // 旧
