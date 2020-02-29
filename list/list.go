@@ -46,6 +46,11 @@ func (list *List) Parse(importPath string) error {
 		return err
 	}
 
+	// 没有内容，则不生成文件
+	if len(content) == 0 {
+		return nil
+	}
+
 	// 写入，添加包名和依赖导入
 	importPaths := parser.ImportPathMap(importPathMap).Keys()
 	importPaths = toollist.Filter(importPaths, pkg.ImportPath)
