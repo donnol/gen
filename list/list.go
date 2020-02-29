@@ -11,6 +11,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	commandName  = "list"
+	attrColumn   = "column"
+	attrMap      = "map"
+	attrSliceMap = "slicemap"
+)
+
 // List 列表，解析结构体，生成列表结构体及取列，列映射，列数组映射等方法
 type List struct {
 	parser   *parser.Parser
@@ -67,11 +74,22 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 
 		structName := singleStruct.Name
 		typNameWithPath := singleStruct.Info.GetTypNameWithPath(pkg.ImportPath)
-		if err := list.template.Execute(buf, "List", typText, map[string]interface{}{
-			"typName":         structName,
-			"typNameWithPath": typNameWithPath,
-		}); err != nil {
-			return pkgName, importPathMap, content, errors.WithStack(err)
+
+		existFieldCommand := false
+		for _, singleField := range singleStruct.Fields {
+			if singleField.Info.Commands.ExistCommand(commandName) {
+				existFieldCommand = true
+				break
+			}
+		}
+		if singleStruct.Info.Commands.ExistCommand(commandName) ||
+			existFieldCommand {
+			if err := list.template.Execute(buf, "List", typText, map[string]interface{}{
+				"typName":         structName,
+				"typNameWithPath": typNameWithPath,
+			}); err != nil {
+				return pkgName, importPathMap, content, errors.WithStack(err)
+			}
 		}
 
 		for _, singleField := range singleStruct.Fields {
@@ -81,26 +99,33 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 			fieldTypNameWithPath := singleField.Info.GetTypNameWithPath(pkg.ImportPath)
 
 			// 取列
-			if err := list.template.Execute(buf, "List", columnMethodText, map[string]interface{}{
-				"typName":   structName,
-				"fieldName": fieldName,
-				"fieldType": fieldTypNameWithPath,
-			}); err != nil {
-				return pkgName, importPathMap, content, errors.WithStack(err)
+			if singleField.Info.Commands.ExistCommandAttr(commandName, attrColumn) {
+				if err := list.template.Execute(buf, "List", columnMethodText, map[string]interface{}{
+					"typName":   structName,
+					"fieldName": fieldName,
+					"fieldType": fieldTypNameWithPath,
+				}); err != nil {
+					return pkgName, importPathMap, content, errors.WithStack(err)
+				}
 			}
 			// 映射
 			if singleField.Info.CanUseAsMapKey {
-				for _, methodText := range []string{
-					mapMethodText,      // 列取映射
-					sliceMapMethodText, // 列取数组映射
+				for _, methodText := range []struct {
+					attr string
+					text string
+				}{
+					{attrMap, mapMethodText},           // 列取映射
+					{attrSliceMap, sliceMapMethodText}, // 列取数组映射
 				} {
-					if err := list.template.Execute(buf, "List", methodText, map[string]interface{}{
-						"typName":         structName,
-						"typNameWithPath": typNameWithPath,
-						"fieldName":       fieldName,
-						"fieldType":       fieldTypNameWithPath,
-					}); err != nil {
-						return pkgName, importPathMap, content, errors.WithStack(err)
+					if singleField.Info.Commands.ExistCommandAttr(commandName, methodText.attr) {
+						if err := list.template.Execute(buf, "List", methodText.text, map[string]interface{}{
+							"typName":         structName,
+							"typNameWithPath": typNameWithPath,
+							"fieldName":       fieldName,
+							"fieldType":       fieldTypNameWithPath,
+						}); err != nil {
+							return pkgName, importPathMap, content, errors.WithStack(err)
+						}
 					}
 				}
 			}
