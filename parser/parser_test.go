@@ -1,6 +1,9 @@
 package parser
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestParser(t *testing.T) {
 	parser := New()
@@ -18,5 +21,38 @@ func TestParser(t *testing.T) {
 			t.Fatalf("%+v\n", err)
 		}
 		t.Logf("r: %+v\n", r)
+	}
+}
+
+func TestParseGenCommand(t *testing.T) {
+	for _, cas := range []struct {
+		line string
+		want []Command
+	}{
+		{"@gen list",
+			[]Command{
+				{"list", ""},
+			}},
+		{"@gen list column",
+			[]Command{
+				{"list", "column"},
+			}},
+		{"@gen list map",
+			[]Command{
+				{"list", "map"},
+			}},
+		{"@gen list slicemap",
+			[]Command{
+				{"list", "slicemap"},
+			}},
+		{"@gen list [map, slicemap]",
+			[]Command{
+				{"list", "map"}, {"list", "slicemap"},
+			}},
+	} {
+		r := parseGenCommand(cas.line)
+		if !reflect.DeepEqual(r, cas.want) {
+			t.Fatalf("Bad result: %+v != %+v\n", r, cas.want)
+		}
 	}
 }

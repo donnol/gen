@@ -48,7 +48,36 @@ type Info struct {
 	Comment string // 注释
 	Doc     string // 文档
 
-	Commands []string // 指令，如list, list column, list map, list slicemap等中的一个或多个
+	Commands CommandList // 指令，如list, list column, list map, list slicemap等中的一个或多个
+}
+
+// Command 指令
+type Command struct {
+	Name string // 名称，如：list
+	Attr string // 属性，如: column
+}
+
+// CommandList 列表
+type CommandList []Command
+
+// ExistCommand 存在指令
+func (list CommandList) ExistCommand(name string) bool {
+	for _, single := range list {
+		if single.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+// ExistCommandAttr 存在指令
+func (list CommandList) ExistCommandAttr(name string, attr string) bool {
+	for _, single := range list {
+		if single.Name == name && single.Attr == attr {
+			return true
+		}
+	}
+	return false
 }
 
 // InitWithTypes 初始化
@@ -62,6 +91,9 @@ func (info *Info) InitWithTypes(name, pkgPath, doc, comment string, typ types.Ty
 	info.Comment = comment
 	info.CanUseAsMapKey = types.Comparable(info.TypesType)
 
+	// 解析指令
+	info.initCommandsFromDoc()
+
 	// 路径等信息
 	importPath, typName, typNameWithPath := info.GetImportPathAndTypeName(typ.String())
 	if info.ImportPath == "" {
@@ -69,6 +101,54 @@ func (info *Info) InitWithTypes(name, pkgPath, doc, comment string, typ types.Ty
 	}
 	info.TypName = typName
 	info.TypNameWithPath = typNameWithPath
+}
+
+func (info *Info) initCommandsFromDoc() {
+	// 读取文档行
+	lines := strings.Split(info.Doc, "\n")
+	commands := make([]Command, 0)
+	for _, line := range lines {
+		if !strings.Contains(line, "@gen") {
+			continue
+		}
+
+		cmds := parseGenCommand(line)
+		commands = append(commands, cmds...)
+	}
+	info.Commands = commands
+}
+
+func parseGenCommand(line string) (cmds []Command) {
+	parts := strings.Split(line, " ")
+	if len(parts) < 2 {
+		fmt.Printf("Wrong command: %s\n", line)
+		return
+	}
+	// 如果有多个，需要拆成独立的
+	leftIndex := strings.Index(line, "[")
+	rightIndex := strings.Index(line, "]")
+	if leftIndex != -1 && rightIndex != -1 {
+		attrs := line[leftIndex+1 : rightIndex]
+		attrParts := strings.Split(attrs, ",")
+		for _, p := range attrParts {
+			p := strings.TrimSpace(p)
+			cmds = append(cmds, Command{
+				Name: parts[1],
+				Attr: p,
+			})
+		}
+	} else {
+		var attr string
+		if len(parts) > 2 {
+			attr = parts[2]
+		}
+		cmds = append(cmds, Command{
+			Name: parts[1],
+			Attr: attr,
+		})
+	}
+
+	return
 }
 
 // GetNotEmptyImportPathMap 获取非空导入路径映射
