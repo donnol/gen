@@ -16,7 +16,6 @@
 安装工具`gen`:
 
 ```sh
-# 暂未实现
 go get -u github.com/donnol/gen/cmd/gen
 ```
 
