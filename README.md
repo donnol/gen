@@ -35,9 +35,18 @@ type Model struct {
     // @gen list [map, slicemap]; xxx [xxx, xxx]: 如果后面有多种指令，使用这个格式(NOTE:未实现)
     Name string // 名称
 
+    // @gen join =User.ID: 表示关联User结构体的ID字段，这样就需要知道结构体名和字段名，如果结构体在其它包，还需要有包路径，如：github.com/pkg/errors.XXX.YYY，或相对路径：./pkgpath.XXX.YYY, ../pkgpath.XXX.YYY
+    UserID int // 用户ID
+    UserName string // 用户名
+
     Old bool // 旧
     Height float64 // 高度
     CreatedAt time.Time // 创建时间
+}
+
+type User struct {
+    ID int
+    Name string
 }
 ```
 
@@ -57,9 +66,16 @@ type Model struct {
 type Model struct {
     ID int
     Name string
+    UserID int
+    UserName string
     Old bool
     Height float64
     CreatedAt time.Time
+}
+
+type User struct {
+    ID int
+    Name string
 }
 ```
 
@@ -90,6 +106,19 @@ func (list ModelList) MapListByID() map[int][]Model {
     for _, single := range list {
         result[single.ID] = append(result[single.ID], single)
     }
+    return result
+}
+
+func (list ModelList) JoinUserListByUserIDEqualID(u UserList, f func(Model, User) Model) ModelList {
+    userMap := u.MapByID()
+
+    result := make(ModelList, len(list), len(list))
+    for i, single := range list {
+        tmp := f(single, userMap[single.UserID])
+
+        result[i] = tmp
+    }
+
     return result
 }
 
