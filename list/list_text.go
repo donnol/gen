@@ -41,3 +41,20 @@ var sliceMapMethodText = `
 		return result
 	}
 	`
+
+// 联结方法定义
+var joinMethodText = `
+	// Join{{.joinTyp}}By{{.typField}}Equal{{.joinTypField}} 以{{.typField}}与{{.joinTypField}}相等联结{{.joinTyp}}
+	func (list {{.typName}}List) Join{{.joinTyp}}By{{.typField}}Equal{{.joinTypField}}(u {{.joinTyp}}, f func({{.typName}}, User) {{.typName}}) {{.typName}}List {
+		userMap := u.MapBy{{.joinTypField}}()
+
+		result := make({{.typName}}List, len(list), len(list))
+		for i, single := range list {
+			tmp := f(single, userMap[single.{{.typField}}])
+
+			result[i] = tmp
+		}
+
+		return result
+	}
+	`
