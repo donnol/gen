@@ -45,7 +45,7 @@ var sliceMapMethodText = `
 // 联结方法定义
 var joinMethodText = `
 	// Join{{.joinTyp}}By{{.typField}}Equal{{.joinTypField}} 以{{.typField}}与{{.joinTypField}}相等联结{{.joinTyp}}
-	func (list {{.typName}}List) Join{{.joinTyp}}By{{.typField}}Equal{{.joinTypField}}(u {{.joinTyp}}, f func({{.typName}}, User) {{.typName}}) {{.typName}}List {
+	func (list {{.typName}}List) Join{{.joinTyp}}By{{.typField}}Equal{{.joinTypField}}(u {{.joinTyp}}List, f func({{.typName}}, {{.joinTyp}}) {{.typName}}) {{.typName}}List {
 		userMap := u.MapBy{{.joinTypField}}()
 
 		result := make({{.typName}}List, len(list), len(list))
@@ -55,6 +55,23 @@ var joinMethodText = `
 			result[i] = tmp
 		}
 
+		return result
+	}
+	`
+
+// 衍生方法定义
+var deriveMethodText = `
+	// DeriveBy{{.typField}}Equal{{.joinTypField}} 衍生
+	func (list {{.typName}}List) DeriveBy{{.typField}}Equal{{.joinTypField}}(u {{.joinTyp}}List, f func({{.typName}}, {{.joinTyp}}) {{.deriveTyp}}) {{.deriveTyp}}List {
+		userMap := u.MapBy{{.joinTypField}}()
+	
+		result := make({{.deriveTyp}}List, len(list), len(list))
+		for i, single := range list {
+			tmp := f(single, userMap[single.{{.typField}}])
+	
+			result[i] = tmp
+		}
+	
 		return result
 	}
 	`
