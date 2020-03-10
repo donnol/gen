@@ -75,3 +75,14 @@ var deriveMethodText = `
 		return result
 	}
 	`
+
+// 取首个
+var firstMethodText = `
+	// First 取首个
+	func (list {{.typName}}List) First() {{.typName}} {
+		if len(list) == 0 {
+			panic("Empty list")
+		}
+		return list[0]
+	}
+	`
