@@ -11,11 +11,15 @@ import (
 	"github.com/pkg/errors"
 )
 
+// 指令
 const (
 	commandName  = "list"
 	attrColumn   = "column"
 	attrMap      = "map"
 	attrSliceMap = "slicemap"
+
+	joinCommandName = "join"
+	joinEqual       = "="
 )
 
 // List 列表，解析结构体，生成列表结构体及取列，列映射，列数组映射等方法
@@ -132,6 +136,24 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 							return pkgName, importPathMap, content, errors.WithStack(err)
 						}
 					}
+				}
+			}
+
+			// TODO:
+			// join
+			if singleStruct.Info.Commands.ExistCommand(joinCommandName) {
+				var joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string
+
+				if err := list.template.Execute(buf, "List", typText, map[string]interface{}{
+					"typName":         structName,
+					"typNameWithPath": typNameWithPath,
+					"typFieldName":    fieldName,
+					"joinTyp":         joinTyp,
+					"joinTypWithPath": joinTypWithPath,
+					"joinTypField":    joinTypField,
+					"joinTypFieldTyp": joinTypFieldTyp,
+				}); err != nil {
+					return pkgName, importPathMap, content, errors.WithStack(err)
 				}
 			}
 		}

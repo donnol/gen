@@ -44,13 +44,22 @@ var sliceMapMethodText = `
 
 // 联结方法定义
 var joinMethodText = `
-	// Join{{.joinTyp}}By{{.typField}}Equal{{.joinTypField}} 以{{.typField}}与{{.joinTypField}}相等联结{{.joinTyp}}
-	func (list {{.typName}}List) Join{{.joinTyp}}By{{.typField}}Equal{{.joinTypField}}(u {{.joinTyp}}List, f func({{.typName}}, {{.joinTyp}}) {{.typName}}) {{.typName}}List {
-		userMap := u.MapBy{{.joinTypField}}()
+	func (list {{.typName}}List) Join{{.joinTyp}}By{{.typFieldName}}Equal{{.joinTypField}}(
+		ol []{{.joinTypWithPath}},
+		f func(
+			{{.typNameWithPath}},
+			{{.joinTypWithPath}},
+		) {{.typNameWithPath}},
+	) {{.typName}}List {
+
+		oMap := make(map[{{.joinTypFieldTyp}}]{{.joinTypWithPath}})
+		for _, single := range ol {
+			oMap[single.{{.joinTypField}}] = single
+		}
 
 		result := make({{.typName}}List, len(list), len(list))
 		for i, single := range list {
-			tmp := f(single, userMap[single.{{.typField}}])
+			tmp := f(single, oMap[single.{{.typFieldName}}])
 
 			result[i] = tmp
 		}
