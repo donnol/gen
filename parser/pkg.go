@@ -54,7 +54,7 @@ type Info struct {
 // Command 指令
 type Command struct {
 	Name string // 名称，如：list
-	Attr string // 属性，如: column
+	Attr Attr   // 属性，如: column
 }
 
 // CommandList 列表
@@ -71,13 +71,33 @@ func (list CommandList) ExistCommand(name string) bool {
 }
 
 // ExistCommandAttr 存在指令
-func (list CommandList) ExistCommandAttr(name string, attr string) bool {
+func (list CommandList) ExistCommandAttr(name string, attr Attr) bool {
 	for _, single := range list {
 		if single.Name == name && single.Attr == attr {
 			return true
 		}
 	}
 	return false
+}
+
+// GetJoinTyp 获取join类型信息
+func (list CommandList) GetJoinTyp() (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
+	for _, single := range list {
+		return single.Attr.GetJoinTyp()
+	}
+
+	return
+}
+
+// Attr 属性
+type Attr string
+
+// GetJoinTyp 获取join类型信息
+func (attr Attr) GetJoinTyp() (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
+	// TODO:
+	// 解析结构体和字段
+
+	return
 }
 
 // InitWithTypes 初始化
@@ -134,7 +154,7 @@ func parseGenCommand(line string) (cmds []Command) {
 			p := strings.TrimSpace(p)
 			cmds = append(cmds, Command{
 				Name: parts[1],
-				Attr: p,
+				Attr: Attr(p),
 			})
 		}
 	} else {
@@ -144,7 +164,7 @@ func parseGenCommand(line string) (cmds []Command) {
 		}
 		cmds = append(cmds, Command{
 			Name: parts[1],
-			Attr: attr,
+			Attr: Attr(attr),
 		})
 	}
 

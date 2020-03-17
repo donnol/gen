@@ -126,7 +126,7 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 					{attrMap, mapMethodText},           // 列取映射
 					{attrSliceMap, sliceMapMethodText}, // 列取数组映射
 				} {
-					if singleField.Info.Commands.ExistCommandAttr(commandName, methodText.attr) {
+					if singleField.Info.Commands.ExistCommandAttr(commandName, parser.Attr(methodText.attr)) {
 						if err := list.template.Execute(buf, "List", methodText.text, map[string]interface{}{
 							"typName":         structName,
 							"typNameWithPath": typNameWithPath,
@@ -139,10 +139,9 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 				}
 			}
 
-			// TODO:
 			// join
 			if singleStruct.Info.Commands.ExistCommand(joinCommandName) {
-				var joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string
+				joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp := singleStruct.Info.Commands.GetJoinTyp()
 
 				if err := list.template.Execute(buf, "List", typText, map[string]interface{}{
 					"typName":         structName,
