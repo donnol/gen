@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // Pkg 包
@@ -94,8 +96,21 @@ type Attr string
 
 // GetJoinTyp 获取join类型信息
 func (attr Attr) GetJoinTyp() (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
-	// TODO:
+	typAndField := attr[1:]
+
 	// 解析结构体和字段
+	parts := strings.Split(string(typAndField), ".")
+	if len(parts) < 2 {
+		panic(errors.Errorf("Bad join attr: %s", attr))
+	}
+
+	// FIXME:可能包含路径
+	joinTyp = parts[0]
+	joinTypField = parts[1]
+
+	// TODO:找到带路径类型和字段类型
+	joinTypWithPath = joinTyp
+	joinTypFieldTyp = "int"
 
 	return
 }

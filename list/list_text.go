@@ -42,8 +42,9 @@ var sliceMapMethodText = `
 	}
 	`
 
-// 联结方法定义
+// 连表方法定义
 var joinMethodText = `
+	// Join{{.joinTyp}}By{{.typFieldName}}Equal{{.joinTypField}} 连表
 	func (list {{.typName}}List) Join{{.joinTyp}}By{{.typFieldName}}Equal{{.joinTypField}}(
 		ol []{{.joinTypWithPath}},
 		f func(

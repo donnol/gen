@@ -22,6 +22,10 @@ type Model struct {
 	// @gen list [map, slicemap]
 	Age float64 // 年龄
 
+	// @gen join =User.ID
+	UserID   int
+	UserName string
+
 	// Array，Chan，Map，Pointer，Slice
 	Array   [4]int
 	Chan    chan int
@@ -37,4 +41,10 @@ type Model struct {
 	OutMap3    map[types.Type]errors.Frame
 	OutPointer *errors.Frame
 	OutSlice   []errors.Frame
+}
+
+// User 用户
+type User struct {
+	ID   int
+	Name string
 }
