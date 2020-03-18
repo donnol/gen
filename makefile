@@ -1,4 +1,4 @@
-.PHONY:test install
+.PHONY:test install build gen
 
 # 指定go版本，如：go1.14rc1。不过在使用前请确保本地已安装！
 gov=go
@@ -16,6 +16,13 @@ clean:
 
 install:
 	$(gov) install ./...
+
+build:
+	cd cmd/gen && \
+	$(gov) install
+
+gen:build
+	gen -r
 
 # 通过git log查看文件的修改时间
 file=xxx
