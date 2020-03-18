@@ -58,7 +58,13 @@ func (temp *Template) SpliceFile(opt FileOption) string {
 // WriteFile 写文件
 func (temp *Template) WriteFile(filename string, content []byte) error {
 	// 写入前先format，并导包
-	formatContent, err := imports.Process(filename, content, &imports.Options{})
+	opt := &imports.Options{
+		TabWidth:  8,
+		TabIndent: true,
+		Comments:  true,
+		Fragment:  true,
+	}
+	formatContent, err := imports.Process(filename, content, opt)
 	if err != nil {
 		return errors.WithMessagef(err, "%s", content)
 	}
