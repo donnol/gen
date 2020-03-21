@@ -24,6 +24,34 @@ type Struct struct {
 	Fields []Field
 }
 
+// StructList 列表
+type StructList []Struct
+
+// Find 找出指定名称的结构体
+func (list StructList) Find(name string) Struct {
+	for _, single := range list {
+		if single.Info.Name == name {
+			return single
+		}
+	}
+	return Struct{}
+}
+
+// FindField 找出指定结构体的指定字段
+func (list StructList) FindField(name, fieldName string) Field {
+	for _, single := range list {
+		if single.Info.Name == name {
+			for _, field := range single.Fields {
+				if field.Info.Name == fieldName {
+					return field
+				}
+			}
+		}
+	}
+
+	return Field{}
+}
+
 // Field 字段
 type Field struct {
 	Info
@@ -83,9 +111,9 @@ func (list CommandList) ExistCommandAttr(name string, attr Attr) bool {
 }
 
 // GetJoinTyp 获取join类型信息
-func (list CommandList) GetJoinTyp() (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
+func (list CommandList) GetJoinTyp(pkgPath string, structs []Struct) (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
 	for _, single := range list {
-		return single.Attr.GetJoinTyp()
+		return single.Attr.GetJoinTyp(pkgPath, structs)
 	}
 
 	return
@@ -95,7 +123,7 @@ func (list CommandList) GetJoinTyp() (joinTyp, joinTypField, joinTypWithPath, jo
 type Attr string
 
 // GetJoinTyp 获取join类型信息
-func (attr Attr) GetJoinTyp() (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
+func (attr Attr) GetJoinTyp(pkgPath string, structs []Struct) (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
 	typAndField := attr[1:]
 
 	// 解析结构体和字段
@@ -104,13 +132,33 @@ func (attr Attr) GetJoinTyp() (joinTyp, joinTypField, joinTypWithPath, joinTypFi
 		panic(errors.Errorf("Bad join attr: %s", attr))
 	}
 
-	// FIXME:可能包含路径
-	joinTyp = parts[0]
-	joinTypField = parts[1]
+	// 包含路径
+	if len(parts) > 2 {
+		// TODO:
+		if strings.Index(string(typAndField), ".") == 0 {
+			// 相对路径：
+			// 去掉第一个斜杆前的内容
+			firstSlashIndex := strings.Index(string(typAndField), "/")
+			fieldLeft := typAndField[firstSlashIndex+1:]
+			_ = fieldLeft
 
-	// TODO:找到带路径类型和字段类型
-	joinTypWithPath = joinTyp
-	joinTypFieldTyp = "int"
+			if strings.Index(string(typAndField), "..") == 0 {
+				// ../pkgpath.XXX.YYY
+			} else {
+				// ./pkgpath.XXX.YYY
+			}
+		} else {
+			// github.com/pkg/errors.XXX.YYY，
+
+		}
+	} else {
+		// User.ID
+		joinTyp = parts[0]
+		joinTypField = parts[1]
+		joinTypWithPath = joinTyp
+		field := StructList(structs).FindField(joinTyp, joinTypField)
+		joinTypFieldTyp = field.Type
+	}
 
 	return
 }

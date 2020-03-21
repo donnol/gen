@@ -141,7 +141,13 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 
 			// join
 			if singleField.Info.Commands.ExistCommand(joinCommandName) {
-				joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp := singleField.Info.Commands.GetJoinTyp()
+				joinTyp,
+					joinTypField,
+					joinTypWithPath,
+					joinTypFieldTyp := singleField.Info.Commands.GetJoinTyp(
+					singleStruct.Info.ImportPath,
+					pkg.Structs,
+				)
 
 				if err := list.template.Execute(buf, "List", joinMethodText, map[string]interface{}{
 					"typName":         structName,
