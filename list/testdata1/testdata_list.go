@@ -1,4 +1,4 @@
-package testdata
+package testdata1
 
 import "github.com/donnol/gen/list/testdata1/content"
 

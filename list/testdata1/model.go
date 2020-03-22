@@ -1,4 +1,4 @@
-package testdata
+package testdata1
 
 import (
 	"go/types"
@@ -29,6 +29,10 @@ type Model struct {
 	// @gen join =./content.Content.ID
 	ContentID    int
 	ContentTitle string
+
+	// @gen join = ../testdata2.Model.ID
+	ModelID   int
+	ModelName string
 
 	// Array，Chan，Map，Pointer，Slice
 	Array   [4]int
