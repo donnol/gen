@@ -21,7 +21,7 @@ build:
 	cd cmd/gen && \
 	$(gov) install
 
-gen:build
+gen:install build
 	gen -r
 
 # 通过git log查看文件的修改时间
