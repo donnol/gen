@@ -11,6 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
+// 生成文件后缀
+const (
+	GenFileSuffix = "_gen_list"
+)
+
 // 指令
 const (
 	commandName  = "list"
@@ -145,6 +150,7 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 					joinTypField,
 					joinTypWithPath,
 					joinTypFieldTyp := singleField.Info.Commands.GetJoinTyp(
+					list.parser,
 					singleStruct.Info.ImportPath,
 					pkg.Structs,
 				)
@@ -169,7 +175,7 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 }
 
 func (list *List) getFileName(pkgDir, pkgName string) string {
-	filename := fmt.Sprintf("%s_list.go", pkgName)
+	filename := fmt.Sprintf("%s%s.go", pkgName, GenFileSuffix)
 	filename = filepath.Join(pkgDir, filename)
 	return filename
 }

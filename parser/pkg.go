@@ -112,9 +112,9 @@ func (list CommandList) ExistCommandAttr(name string, attr Attr) bool {
 }
 
 // GetJoinTyp 获取join类型信息
-func (list CommandList) GetJoinTyp(pkgPath string, structs []Struct) (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
+func (list CommandList) GetJoinTyp(parser *Parser, pkgPath string, structs []Struct) (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
 	for _, single := range list {
-		return single.Attr.GetJoinTyp(pkgPath, structs)
+		return single.Attr.GetJoinTyp(parser, pkgPath, structs)
 	}
 
 	return
@@ -124,7 +124,7 @@ func (list CommandList) GetJoinTyp(pkgPath string, structs []Struct) (joinTyp, j
 type Attr string
 
 // GetJoinTyp 获取join类型信息
-func (attr Attr) GetJoinTyp(pkgPath string, structs []Struct) (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
+func (attr Attr) GetJoinTyp(parser *Parser, pkgPath string, structs []Struct) (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
 	if strings.TrimSpace(string(attr)) == "" {
 		panic(errors.Errorf("Empty attr"))
 	}
@@ -135,8 +135,6 @@ func (attr Attr) GetJoinTyp(pkgPath string, structs []Struct) (joinTyp, joinTypF
 	if len(parts) < 2 {
 		panic(errors.Errorf("Bad join attr: %s", attr))
 	}
-
-	parser := New()
 
 	if len(parts) == 2 {
 		// User.ID

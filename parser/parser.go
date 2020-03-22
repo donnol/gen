@@ -17,16 +17,27 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	testSuffix = "_test"
+)
+
 // Parser 解析器，用于解析源码
 type Parser struct {
+	ignoreFileSuffix []string
 }
 
 // Option 选项
-type Option struct{}
+type Option struct {
+	IgnoreFileSuffix []string // 忽略文件名含有指定后缀的文件
+}
 
 // New 新建
-func New(opt ...Option) *Parser {
-	return &Parser{}
+func New(opts ...Option) *Parser {
+	p := &Parser{}
+	for _, opt := range opts {
+		p.ignoreFileSuffix = append(p.ignoreFileSuffix, opt.IgnoreFileSuffix...)
+	}
+	return p
 }
 
 // ParsePkg 解析包，如：github.com/pkg/errors，返回包信息
@@ -44,14 +55,22 @@ func (p *Parser) ParsePkg(pkg string) (Pkg, error) {
 
 	// 解析目录，获得ast.File
 	pkgs, err := parser.ParseDir(fset, buildPkg.Dir, func(fi os.FileInfo) bool {
-		// 跳过test文件
 		li := strings.LastIndex(fi.Name(), filepath.Ext(fi.Name()))
-		testi := strings.LastIndex(fi.Name(), "_test")
-		if testi == -1 {
-			return true
-		}
-		if li-testi == 5 {
+
+		// 跳过test文件
+		testi := strings.LastIndex(fi.Name(), testSuffix)
+		if testi != -1 && li-testi == len(testSuffix) {
 			return false
+		}
+
+		// 跳过指定文件后缀
+		if len(p.ignoreFileSuffix) > 0 {
+			for _, suf := range p.ignoreFileSuffix {
+				sufi := strings.LastIndex(fi.Name(), suf)
+				if sufi != -1 && li-sufi == len(suf) {
+					return false
+				}
+			}
 		}
 
 		return true
@@ -70,7 +89,7 @@ func (p *Parser) ParsePkg(pkg string) (Pkg, error) {
 		Importer:                 importer.Default(),
 		DisableUnusedImportCheck: true,
 	}
-	info := &types.Info{}
+	info := types.Info{}
 
 	for pkgName, parserPkg := range pkgs {
 		result.Name = pkgName
@@ -83,7 +102,7 @@ func (p *Parser) ParsePkg(pkg string) (Pkg, error) {
 		}
 
 		var typPkg *types.Package
-		typPkg, err = conf.Check(pkg, fset, files, info)
+		typPkg, err = conf.Check(pkg, fset, files, &info)
 		if err != nil {
 			return result, errors.WithStack(err)
 		}

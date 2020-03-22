@@ -60,11 +60,15 @@ func main() {
 	}
 
 	// 生成代码
+	p := parser.New(parser.Option{
+		IgnoreFileSuffix: []string{
+			list.GenFileSuffix,
+		},
+	})
+	t := &template.Template{}
+	l := list.New(p, t)
 	var pkgNum int
 	for _, pkgPath := range allPkgPath {
-		p := parser.New()
-		t := &template.Template{}
-		l := list.New(p, t)
 		fmt.Printf("=== parse path: %s\n", pkgPath)
 		if err := l.Parse(pkgPath); err != nil {
 			fmt.Printf("%v\n", err)
