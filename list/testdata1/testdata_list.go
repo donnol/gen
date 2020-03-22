@@ -1,5 +1,7 @@
 package testdata
 
+import "github.com/donnol/gen/list/testdata1/content"
+
 // ModelList 列表结构体
 type ModelList []Model
 
@@ -65,6 +67,30 @@ func (list ModelList) JoinUserByUserIDEqualID(
 	result := make(ModelList, len(list), len(list))
 	for i, single := range list {
 		tmp := f(single, oMap[single.UserID])
+
+		result[i] = tmp
+	}
+
+	return result
+}
+
+// JoinContentByContentIDEqualID 连表
+func (list ModelList) JoinContentByContentIDEqualID(
+	ol []content.Content,
+	f func(
+		Model,
+		content.Content,
+	) Model,
+) ModelList {
+
+	oMap := make(map[int]content.Content)
+	for _, single := range ol {
+		oMap[single.ID] = single
+	}
+
+	result := make(ModelList, len(list), len(list))
+	for i, single := range list {
+		tmp := f(single, oMap[single.ContentID])
 
 		result[i] = tmp
 	}
