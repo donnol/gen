@@ -3,6 +3,7 @@ package testdata1
 import (
 	"github.com/donnol/gen/list/testdata1/content"
 	"github.com/donnol/gen/list/testdata2"
+	"github.com/donnol/gen/list/testdata3"
 )
 
 // ModelList 列表结构体
@@ -118,6 +119,30 @@ func (list ModelList) JoinModelByModelIDEqualID(
 	result := make(ModelList, len(list), len(list))
 	for i, single := range list {
 		tmp := f(single, oMap[single.ModelID])
+
+		result[i] = tmp
+	}
+
+	return result
+}
+
+// JoinAddrByAddrIDEqualID 连表
+func (list ModelList) JoinAddrByAddrIDEqualID(
+	ol []testdata3.Addr,
+	f func(
+		Model,
+		testdata3.Addr,
+	) Model,
+) ModelList {
+
+	oMap := make(map[int]testdata3.Addr)
+	for _, single := range ol {
+		oMap[single.ID] = single
+	}
+
+	result := make(ModelList, len(list), len(list))
+	for i, single := range list {
+		tmp := f(single, oMap[single.AddrID])
 
 		result[i] = tmp
 	}

@@ -176,9 +176,27 @@ func (attr Attr) GetJoinTyp(pkgPath string, structs []Struct) (joinTyp, joinTypF
 			field := StructList(pkg.Structs).FindField(joinTyp, joinTypField)
 			joinTypFieldTyp = field.Type
 		} else {
-			// TODO:
 			// github.com/pkg/errors.XXX.YYY，
+			fieldLeft := typAndField
+			lastDotIndex := strings.LastIndex(fieldLeft, ".")
+			joinTypField = fieldLeft[lastDotIndex+1:]
+			fieldLeft = fieldLeft[:lastDotIndex]
+			lastDotIndex = strings.LastIndex(fieldLeft, ".")
+			joinTyp = fieldLeft[lastDotIndex+1:]
+			fieldLeft = fieldLeft[:lastDotIndex]
+			lastSlashIndex := strings.LastIndex(fieldLeft, "/")
+			if lastSlashIndex != -1 {
+				joinTypWithPath = fieldLeft[lastSlashIndex+1:] + "." + joinTyp
+			} else {
+				joinTypWithPath = fieldLeft + "." + joinTyp
+			}
 
+			pkg, err := parser.ParsePkg(fieldLeft)
+			if err != nil {
+				panic(err)
+			}
+			field := StructList(pkg.Structs).FindField(joinTyp, joinTypField)
+			joinTypFieldTyp = field.Type
 		}
 	} else {
 		// User.ID

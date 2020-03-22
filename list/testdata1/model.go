@@ -34,6 +34,10 @@ type Model struct {
 	ModelID   int
 	ModelName string
 
+	// @gen join =github.com/donnol/gen/list/testdata3.Addr.ID
+	AddrID   int
+	AddrName string
+
 	// Array，Chan，Map，Pointer，Slice
 	Array   [4]int
 	Chan    chan int
