@@ -124,10 +124,13 @@ type Attr string
 
 // GetJoinTyp 获取join类型信息
 func (attr Attr) GetJoinTyp(pkgPath string, structs []Struct) (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
-	typAndField := attr[1:]
+	if strings.TrimSpace(string(attr)) == "" {
+		panic(errors.Errorf("Empty attr"))
+	}
+	typAndField := string(attr[1:])
 
 	// 解析结构体和字段
-	parts := strings.Split(string(typAndField), ".")
+	parts := strings.Split(typAndField, ".")
 	if len(parts) < 2 {
 		panic(errors.Errorf("Bad join attr: %s", attr))
 	}
@@ -135,14 +138,14 @@ func (attr Attr) GetJoinTyp(pkgPath string, structs []Struct) (joinTyp, joinTypF
 	// 包含路径
 	if len(parts) > 2 {
 		// TODO:
-		if strings.Index(string(typAndField), ".") == 0 {
+		if strings.Index(typAndField, ".") == 0 {
 			// 相对路径：
 			// 去掉第一个斜杆前的内容
-			firstSlashIndex := strings.Index(string(typAndField), "/")
+			firstSlashIndex := strings.Index(typAndField, "/")
 			fieldLeft := typAndField[firstSlashIndex+1:]
 			_ = fieldLeft
 
-			if strings.Index(string(typAndField), "..") == 0 {
+			if strings.Index(typAndField, "..") == 0 {
 				// ../pkgpath.XXX.YYY
 			} else {
 				// ./pkgpath.XXX.YYY
