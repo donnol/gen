@@ -26,6 +26,10 @@ type Model struct {
 	UserID   int
 	UserName string
 
+	// @gen join =./content.Content.ID
+	ContentID    int
+	ContentTitle string
+
 	// Array，Chan，Map，Pointer，Slice
 	Array   [4]int
 	Chan    chan int
