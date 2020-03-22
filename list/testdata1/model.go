@@ -30,7 +30,7 @@ type Model struct {
 	ContentID    int
 	ContentTitle string
 
-	// @gen join = ../testdata2.Model.ID
+	// @gen join =../testdata2.Model.ID
 	ModelID   int
 	ModelName string
 
