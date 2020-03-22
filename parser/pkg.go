@@ -162,13 +162,7 @@ func (attr Attr) GetJoinTyp(pkgPath string, structs []Struct) (joinTyp, joinTypF
 			var joinTypPkgPath string
 			if strings.Index(typAndField, "..") == 0 {
 				// ../pkgpath.XXX.YYY
-				// 先回到上一个目录，再拼接
-				lastSlashIndex := strings.LastIndex(pkgPath, "/")
-				if lastSlashIndex != -1 {
-					joinTypPkgPath = filepath.Join(pkgPath[:lastSlashIndex], fieldLeft)
-				} else {
-					panic(errors.Errorf("%s do not exist last dir", pkgPath))
-				}
+				joinTypPkgPath = filepath.Clean(filepath.Join(pkgPath, "../", fieldLeft))
 			} else {
 				// ./pkgpath.XXX.YYY
 				joinTypPkgPath = filepath.Join(pkgPath, fieldLeft)
