@@ -138,74 +138,63 @@ func (attr Attr) GetJoinTyp(pkgPath string, structs []Struct) (joinTyp, joinTypF
 
 	parser := New()
 
-	// 包含路径
-	if len(parts) > 2 {
-		if strings.Index(typAndField, ".") == 0 {
-			// 相对路径：
-			// 去掉第一个斜杆前的内容
-			firstSlashIndex := strings.Index(typAndField, "/")
-			fieldLeft := typAndField[firstSlashIndex+1:]
-			lastDotIndex := strings.LastIndex(fieldLeft, ".")
-			joinTypField = fieldLeft[lastDotIndex+1:]
-			fieldLeft = fieldLeft[:lastDotIndex]
-			lastDotIndex = strings.LastIndex(fieldLeft, ".")
-			joinTyp = fieldLeft[lastDotIndex+1:]
-			fieldLeft = fieldLeft[:lastDotIndex]
-			lastSlashIndex := strings.LastIndex(fieldLeft, "/")
-			if lastSlashIndex != -1 {
-				joinTypWithPath = fieldLeft[lastSlashIndex+1:] + "." + joinTyp
-			} else {
-				joinTypWithPath = fieldLeft + "." + joinTyp
-			}
-
-			// 找到包路径
-			var joinTypPkgPath string
-			if strings.Index(typAndField, "..") == 0 {
-				// ../pkgpath.XXX.YYY
-				joinTypPkgPath = filepath.Clean(filepath.Join(pkgPath, "../", fieldLeft))
-			} else {
-				// ./pkgpath.XXX.YYY
-				joinTypPkgPath = filepath.Join(pkgPath, fieldLeft)
-			}
-			fmt.Printf("-- joinTypPkgPath: %s\n", joinTypPkgPath)
-
-			pkg, err := parser.ParsePkg(joinTypPkgPath)
-			if err != nil {
-				panic(err)
-			}
-			field := StructList(pkg.Structs).FindField(joinTyp, joinTypField)
-			joinTypFieldTyp = field.Type
-		} else {
-			// github.com/pkg/errors.XXX.YYY，
-			fieldLeft := typAndField
-			lastDotIndex := strings.LastIndex(fieldLeft, ".")
-			joinTypField = fieldLeft[lastDotIndex+1:]
-			fieldLeft = fieldLeft[:lastDotIndex]
-			lastDotIndex = strings.LastIndex(fieldLeft, ".")
-			joinTyp = fieldLeft[lastDotIndex+1:]
-			fieldLeft = fieldLeft[:lastDotIndex]
-			lastSlashIndex := strings.LastIndex(fieldLeft, "/")
-			if lastSlashIndex != -1 {
-				joinTypWithPath = fieldLeft[lastSlashIndex+1:] + "." + joinTyp
-			} else {
-				joinTypWithPath = fieldLeft + "." + joinTyp
-			}
-
-			pkg, err := parser.ParsePkg(fieldLeft)
-			if err != nil {
-				panic(err)
-			}
-			field := StructList(pkg.Structs).FindField(joinTyp, joinTypField)
-			joinTypFieldTyp = field.Type
-		}
-	} else {
+	if len(parts) == 2 {
 		// User.ID
 		joinTyp = parts[0]
 		joinTypField = parts[1]
 		joinTypWithPath = joinTyp
 		field := StructList(structs).FindField(joinTyp, joinTypField)
 		joinTypFieldTyp = field.Type
+
+		return
 	}
+
+	// 包含路径
+	var fieldLeft, joinTypPkgPath string
+
+	if strings.Index(typAndField, ".") == 0 {
+		// 相对路径：
+		// 去掉第一个斜杆前的内容
+		firstSlashIndex := strings.Index(typAndField, "/")
+		fieldLeft = typAndField[firstSlashIndex+1:]
+	} else {
+		// github.com/pkg/errors.XXX.YYY，
+		fieldLeft = typAndField
+	}
+
+	// 结构体和字段
+	lastDotIndex := strings.LastIndex(fieldLeft, ".")
+	joinTypField = fieldLeft[lastDotIndex+1:]
+	fieldLeft = fieldLeft[:lastDotIndex]
+	lastDotIndex = strings.LastIndex(fieldLeft, ".")
+	joinTyp = fieldLeft[lastDotIndex+1:]
+	fieldLeft = fieldLeft[:lastDotIndex]
+	lastSlashIndex := strings.LastIndex(fieldLeft, "/")
+	if lastSlashIndex != -1 {
+		joinTypWithPath = fieldLeft[lastSlashIndex+1:] + "." + joinTyp
+	} else {
+		joinTypWithPath = fieldLeft + "." + joinTyp
+	}
+
+	// 找到包路径
+	if strings.Index(typAndField, "..") == 0 {
+		// ../pkgpath.XXX.YYY
+		joinTypPkgPath = filepath.Clean(filepath.Join(pkgPath, "../", fieldLeft))
+	} else if strings.Index(typAndField, ".") == 0 {
+		// ./pkgpath.XXX.YYY
+		joinTypPkgPath = filepath.Join(pkgPath, fieldLeft)
+	} else {
+		// github.com/pkg/errors.XXX.YYY，
+		joinTypPkgPath = fieldLeft
+	}
+
+	// 字段类型
+	pkg, err := parser.ParsePkg(joinTypPkgPath)
+	if err != nil {
+		panic(err)
+	}
+	field := StructList(pkg.Structs).FindField(joinTyp, joinTypField)
+	joinTypFieldTyp = field.Type
 
 	return
 }
