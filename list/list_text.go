@@ -71,13 +71,23 @@ var joinMethodText = `
 
 // 衍生方法定义
 var deriveMethodText = `
-	// DeriveBy{{.typField}}Equal{{.joinTypField}} 衍生
-	func (list {{.typName}}List) DeriveBy{{.typField}}Equal{{.joinTypField}}(u {{.joinTyp}}List, f func({{.typName}}, {{.joinTyp}}) {{.deriveTyp}}) {{.deriveTyp}}List {
-		userMap := u.MapBy{{.joinTypField}}()
+	// DeriveBy{{.typFieldName}}Equal{{.joinTypField}} 衍生
+	func (list {{.typName}}List) DeriveBy{{.typFieldName}}Equal{{.joinTypField}}(
+		ol []{{.joinTypWithPath}},
+		f func(
+			{{.typNameWithPath}},
+			{{.joinTypWithPath}},
+		) {{.deriveTypWithPath}},
+	) []{{.deriveTypWithPath}} {
+
+		oMap := make(map[{{.joinTypFieldTyp}}]{{.joinTypWithPath}})
+		for _, single := range ol {
+			oMap[single.{{.joinTypField}}] = single
+		}
 	
-		result := make({{.deriveTyp}}List, len(list), len(list))
+		result := make([]{{.deriveTypWithPath}}, len(list), len(list))
 		for i, single := range list {
-			tmp := f(single, userMap[single.{{.typField}}])
+			tmp := f(single, oMap[single.{{.typFieldName}}])
 	
 			result[i] = tmp
 		}

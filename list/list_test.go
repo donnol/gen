@@ -59,4 +59,19 @@ func TestListGenResult(t *testing.T) {
 	if !reflect.DeepEqual(mr, mwant) {
 		t.Fatalf("Bad result: %+v != %+v\n", jur, jurwant)
 	}
+
+	dur := ml.DeriveByUserIDEqualID([]testdata1.User{{ID: 1, Name: "jd"}}, func(m testdata1.Model, u testdata1.User) testdata1.ModelUser {
+		return testdata1.ModelUser{
+			ModelID:   m.ID,
+			ModelName: m.Name,
+			UserID:    u.ID,
+			UserName:  u.Name,
+		}
+	})
+	durwant := []testdata1.ModelUser{
+		{ModelID: 1, ModelName: "jd", UserID: 1, UserName: "jd"},
+	}
+	if !reflect.DeepEqual(dur, durwant) {
+		t.Fatalf("Bad result: %+v != %+v\n", jur, jurwant)
+	}
 }

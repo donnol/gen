@@ -25,6 +25,8 @@ const (
 
 	joinCommandName = "join"
 	joinEqual       = "="
+
+	deriveCommandName = "derive"
 )
 
 // List 列表，解析结构体，生成列表结构体及取列，列映射，列数组映射等方法
@@ -91,7 +93,8 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 
 		existFieldCommand := false
 		for _, singleField := range singleStruct.Fields {
-			if singleField.Info.Commands.ExistCommand(commandName) {
+			if singleField.Info.Commands.ExistCommand(commandName) ||
+				singleField.Info.Commands.ExistCommand(joinCommandName) {
 				existFieldCommand = true
 				break
 			}
@@ -163,6 +166,32 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 					"joinTypWithPath": joinTypWithPath,
 					"joinTypField":    joinTypField,
 					"joinTypFieldTyp": joinTypFieldTyp,
+				}); err != nil {
+					return pkgName, importPathMap, content, errors.WithStack(err)
+				}
+			}
+
+			// derive
+			if singleField.Info.Commands.ExistCommand(deriveCommandName) {
+				joinTyp,
+					joinTypField,
+					joinTypWithPath,
+					joinTypFieldTyp := singleField.Info.Commands.GetJoinTyp(
+					list.parser,
+					singleStruct.Info.ImportPath,
+					pkg.Structs,
+				)
+				_, deriveTypWithPath := singleField.Info.Commands.GetExtraTyp(list.parser)
+
+				if err := list.template.Execute(buf, "List", deriveMethodText, map[string]interface{}{
+					"typName":           structName,
+					"typNameWithPath":   typNameWithPath,
+					"typFieldName":      fieldName,
+					"joinTyp":           joinTyp,
+					"joinTypWithPath":   joinTypWithPath,
+					"joinTypField":      joinTypField,
+					"joinTypFieldTyp":   joinTypFieldTyp,
+					"deriveTypWithPath": deriveTypWithPath,
 				}); err != nil {
 					return pkgName, importPathMap, content, errors.WithStack(err)
 				}

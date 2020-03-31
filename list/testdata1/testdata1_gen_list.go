@@ -78,6 +78,30 @@ func (list ModelList) JoinUserByUserIDEqualID(
 	return result
 }
 
+// DeriveByUserIDEqualID 衍生
+func (list ModelList) DeriveByUserIDEqualID(
+	ol []User,
+	f func(
+		Model,
+		User,
+	) ModelUser,
+) []ModelUser {
+
+	oMap := make(map[int]User)
+	for _, single := range ol {
+		oMap[single.ID] = single
+	}
+
+	result := make([]ModelUser, len(list), len(list))
+	for i, single := range list {
+		tmp := f(single, oMap[single.UserID])
+
+		result[i] = tmp
+	}
+
+	return result
+}
+
 // JoinContentByContentIDEqualID 连表
 func (list ModelList) JoinContentByContentIDEqualID(
 	ol []content.Content,

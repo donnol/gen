@@ -23,6 +23,7 @@ type Model struct {
 	Age float64 // 年龄
 
 	// @gen join =User.ID
+	// @gen derive =User.ID ModelUser
 	UserID   int
 	UserName string
 
@@ -59,4 +60,12 @@ type Model struct {
 type User struct {
 	ID   int
 	Name string
+}
+
+// ModelUser 模型用户
+type ModelUser struct {
+	ModelID   int
+	ModelName string
+	UserID    int
+	UserName  string
 }

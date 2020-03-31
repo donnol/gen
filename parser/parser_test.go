@@ -31,23 +31,23 @@ func TestParseGenCommand(t *testing.T) {
 	}{
 		{"@gen list",
 			[]Command{
-				{"list", ""},
+				{"list", "", ""},
 			}},
 		{"@gen list column",
 			[]Command{
-				{"list", "column"},
+				{"list", "column", ""},
 			}},
 		{"@gen list map",
 			[]Command{
-				{"list", "map"},
+				{"list", "map", ""},
 			}},
 		{"@gen list slicemap",
 			[]Command{
-				{"list", "slicemap"},
+				{"list", "slicemap", ""},
 			}},
 		{"@gen list [map, slicemap]",
 			[]Command{
-				{"list", "map"}, {"list", "slicemap"},
+				{"list", "map", ""}, {"list", "slicemap", ""},
 			}},
 	} {
 		r := parseGenCommand(cas.line)

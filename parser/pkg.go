@@ -84,8 +84,9 @@ type Info struct {
 
 // Command 指令
 type Command struct {
-	Name string // 名称，如：list
-	Attr Attr   // 属性，如: column
+	Name  string // 名称，如：list
+	Attr  Attr   // 属性，如: column
+	Extra string // 额外，如: deriveType
 }
 
 // CommandList 列表
@@ -115,6 +116,20 @@ func (list CommandList) ExistCommandAttr(name string, attr Attr) bool {
 func (list CommandList) GetJoinTyp(parser *Parser, pkgPath string, structs []Struct) (joinTyp, joinTypField, joinTypWithPath, joinTypFieldTyp string) {
 	for _, single := range list {
 		return single.Attr.GetJoinTyp(parser, pkgPath, structs)
+	}
+
+	return
+}
+
+// GetExtraTyp 获取额外信息
+func (list CommandList) GetExtraTyp(parser *Parser) (extraTyp, extraTypWithPath string) {
+	for _, single := range list {
+		if single.Extra != "" {
+			// TODO:实现带路径类型解析
+			extraTyp = single.Extra
+			extraTypWithPath = single.Extra
+			return
+		}
 	}
 
 	return
@@ -255,13 +270,17 @@ func parseGenCommand(line string) (cmds []Command) {
 			})
 		}
 	} else {
-		var attr string
+		var attr, extra string
 		if len(parts) > 2 {
 			attr = parts[2]
 		}
+		if len(parts) > 3 {
+			extra = parts[3]
+		}
 		cmds = append(cmds, Command{
-			Name: parts[1],
-			Attr: Attr(attr),
+			Name:  parts[1],
+			Attr:  Attr(attr),
+			Extra: extra,
 		})
 	}
 
