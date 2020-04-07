@@ -98,11 +98,7 @@ func main() {
 	}
 
 	// 生成代码
-	p := parser.New(parser.Option{
-		IgnoreFileSuffix: []string{
-			list.GenFileSuffix,
-		},
-	})
+	p := parser.New()
 	t := &template.Template{}
 	l := list.New(p, t)
 	var pkgNum int
