@@ -21,11 +21,22 @@ go get -u github.com/donnol/gen/cmd/gen
 
 先要在写结构体的时候在文档做好标志(写的时候请忽略标记后的说明)，如下：
 
+命令格式：
+
+| 命令 | 子命令 | [属性]    | [参数]   |
+| ---- | ------ | --------- | -------- |
+| gen  | list   | column... | .ID      |
+| gen  | join   |           | =User.ID |
+
 ```go
 // Model 模型
 //
 // @gen list: 出现这个标记表示这个结构体需要生成相应的列表结构体，这个是可选的，因为字段标记里出现了也要生成
 type Model struct {
+    // 内嵌结构体
+    // @gen list column .ID
+    Inner
+
     // @gen list column: 出现这个标记表示列表结构体应该有取ID列值的方法，如果只有这个标记，没有结构体标记，也要生成相应的列表结构体
     ID int // 记录id
 
@@ -42,6 +53,10 @@ type Model struct {
     Old bool // 旧
     Height float64 // 高度
     CreatedAt time.Time // 创建时间
+}
+
+type Inner struct {
+    ID int
 }
 
 type User struct {
