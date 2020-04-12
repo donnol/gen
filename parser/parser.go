@@ -140,8 +140,19 @@ func (p *Parser) getStructDocAndComment(pkg string, parserPkg *ast.Package) (
 
 			for _, field := range structType.Fields.List {
 				var fieldName, fieldDoc, fieldComment string
-				for _, name := range field.Names {
-					fieldName = name.Name
+				// 内嵌结构体需要使用ast.Ident来获取名称
+				if len(field.Names) != 0 {
+					for _, name := range field.Names {
+						fieldName = name.Name
+					}
+				} else {
+					astField, ok := field.Type.(*ast.Ident)
+					if ok {
+						fieldName = astField.Name
+					}
+				}
+				if fieldName == "" {
+					fmt.Printf("Can't find field name: %+v\n", field)
 				}
 				if field.Doc != nil {
 					fieldDoc = strings.TrimSpace(field.Doc.Text())
@@ -191,6 +202,7 @@ func (p *Parser) getStructFromPkgScope(
 			key := p.getStructDocAndCommentMapKey(obj.Name(), field.Name())
 			tmpField := Field{}
 			tmpField.Info.InitWithTypes(field.Name(), "", docMap[key], commentMap[key], field.Type())
+			tmpField.Anonymous = field.Anonymous()
 			tmp.Fields = append(tmp.Fields, tmpField)
 		}
 

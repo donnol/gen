@@ -12,7 +12,7 @@ var columnMethodText = `
 	func (list {{.typName}}List) Column{{.fieldName}}() []{{.fieldType}} {
 		result := make([]{{.fieldType}}, len(list), len(list))
 		for i, single := range list {
-			result[i] = single.{{.fieldName}}
+			result[i] = single.{{.fieldNameWithInner}}
 		}
 		return result
 	}
@@ -24,7 +24,7 @@ var mapMethodText = `
 	func (list {{.typName}}List) Map{{.fieldName}}() map[{{.fieldType}}]{{.typNameWithPath}} {
 		result := make(map[{{.fieldType}}]{{.typNameWithPath}})
 		for _, single := range list {
-			result[single.{{.fieldName}}] = single
+			result[single.{{.fieldNameWithInner}}] = single
 		}
 		return result
 	}
@@ -36,7 +36,7 @@ var sliceMapMethodText = `
 	func (list {{.typName}}List) MapListBy{{.fieldName}}() map[{{.fieldType}}][]{{.typNameWithPath}} {
 		result := make(map[{{.fieldType}}][]{{.typNameWithPath}})
 		for _, single := range list {
-			result[single.{{.fieldName}}] = append(result[single.{{.fieldName}}], single)
+			result[single.{{.fieldNameWithInner}}] = append(result[single.{{.fieldNameWithInner}}], single)
 		}
 		return result
 	}

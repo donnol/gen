@@ -62,6 +62,8 @@ type Field struct {
 type Info struct {
 	Name string // 名称，如：Info
 
+	Anonymous bool // 是否匿名
+
 	// 可以使用这个字段来断言到具体的类型，如go/types.Struct
 	TypesType types.Type // go/types.Type接口
 
@@ -304,6 +306,26 @@ func (info Info) GetTypNameWithPath(pkgImportPath string) string {
 		typNameWithPath = info.TypName
 	}
 	return typNameWithPath
+}
+
+// GetTypesTypeStructField 获取结构体字段信息
+func (info Info) GetTypesTypeStructField(fieldName string) (
+	typName string, typNameWithPath string,
+) {
+	v, ok := info.TypesType.Underlying().(*types.Struct)
+	if !ok {
+		return
+	}
+	for i := 0; i < v.NumFields(); i++ {
+		field := v.Field(i)
+		if field.Name() != fieldName {
+			continue
+		}
+		typName = field.Type().String()
+		typNameWithPath = field.Type().String()
+	}
+
+	return
 }
 
 // GetImportPathAndTypeName 获取导入路径和类型名称

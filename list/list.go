@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/donnol/gen/parser"
 	"github.com/donnol/gen/template"
@@ -114,13 +115,22 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 
 			fieldName := singleField.Name
 			fieldTypNameWithPath := singleField.Info.GetTypNameWithPath(pkg.ImportPath)
+			fieldNameWithInner := fieldName
+			extraTyp, extraTypWithPath := singleField.Info.Commands.GetExtraTyp(list.parser)
 
 			// 取列
 			if singleField.Info.Commands.ExistCommandAttr(commandName, attrColumn) {
+				if singleField.Anonymous {
+					innerFieldName := strings.TrimLeft(extraTyp, ".")
+					fieldName += innerFieldName
+					fieldNameWithInner += extraTyp
+					_, fieldTypNameWithPath = singleField.GetTypesTypeStructField(innerFieldName)
+				}
 				if err := list.template.Execute(buf, "List", columnMethodText, map[string]interface{}{
-					"typName":   structName,
-					"fieldName": fieldName,
-					"fieldType": fieldTypNameWithPath,
+					"typName":            structName,
+					"fieldName":          fieldName,
+					"fieldNameWithInner": fieldNameWithInner,
+					"fieldType":          fieldTypNameWithPath,
 				}); err != nil {
 					return pkgName, importPathMap, content, errors.WithStack(err)
 				}
@@ -136,10 +146,11 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 				} {
 					if singleField.Info.Commands.ExistCommandAttr(commandName, parser.Attr(methodText.attr)) {
 						if err := list.template.Execute(buf, "List", methodText.text, map[string]interface{}{
-							"typName":         structName,
-							"typNameWithPath": typNameWithPath,
-							"fieldName":       fieldName,
-							"fieldType":       fieldTypNameWithPath,
+							"typName":            structName,
+							"typNameWithPath":    typNameWithPath,
+							"fieldName":          fieldName,
+							"fieldNameWithInner": fieldNameWithInner,
+							"fieldType":          fieldTypNameWithPath,
 						}); err != nil {
 							return pkgName, importPathMap, content, errors.WithStack(err)
 						}
@@ -181,7 +192,6 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 					singleStruct.Info.ImportPath,
 					pkg.Structs,
 				)
-				_, deriveTypWithPath := singleField.Info.Commands.GetExtraTyp(list.parser)
 
 				if err := list.template.Execute(buf, "List", deriveMethodText, map[string]interface{}{
 					"typName":           structName,
@@ -191,7 +201,7 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 					"joinTypWithPath":   joinTypWithPath,
 					"joinTypField":      joinTypField,
 					"joinTypFieldTyp":   joinTypFieldTyp,
-					"deriveTypWithPath": deriveTypWithPath,
+					"deriveTypWithPath": extraTypWithPath,
 				}); err != nil {
 					return pkgName, importPathMap, content, errors.WithStack(err)
 				}

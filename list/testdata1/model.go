@@ -10,6 +10,9 @@ import (
 //
 // @gen list
 type Model struct {
+	// @gen list column .Code
+	Inner
+
 	// @gen list column
 	// 唯一
 	ID int // id
@@ -54,6 +57,11 @@ type Model struct {
 	OutMap3    map[types.Type]errors.Frame
 	OutPointer *errors.Frame
 	OutSlice   []errors.Frame
+}
+
+// Inner 内嵌
+type Inner struct {
+	Code string
 }
 
 // User 用户

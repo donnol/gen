@@ -9,6 +9,15 @@ import (
 // ModelList 列表结构体
 type ModelList []Model
 
+// ColumnInnerCode InnerCode列
+func (list ModelList) ColumnInnerCode() []string {
+	result := make([]string, len(list), len(list))
+	for i, single := range list {
+		result[i] = single.Inner.Code
+	}
+	return result
+}
+
 // ColumnID ID列
 func (list ModelList) ColumnID() []int {
 	result := make([]int, len(list), len(list))
