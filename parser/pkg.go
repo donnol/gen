@@ -264,11 +264,17 @@ func parseGenCommand(line string) (cmds []Command) {
 	if leftIndex != -1 && rightIndex != -1 {
 		attrs := line[leftIndex+1 : rightIndex]
 		attrParts := strings.Split(attrs, ",")
+
+		var extra string
+		if rightIndex+2 < len(line) {
+			extra = line[rightIndex+2:]
+		}
 		for _, p := range attrParts {
 			p := strings.TrimSpace(p)
 			cmds = append(cmds, Command{
-				Name: parts[1],
-				Attr: Attr(p),
+				Name:  parts[1],
+				Attr:  Attr(p),
+				Extra: extra,
 			})
 		}
 	} else {

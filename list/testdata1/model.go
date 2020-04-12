@@ -10,7 +10,7 @@ import (
 //
 // @gen list
 type Model struct {
-	// @gen list column .Code
+	// @gen list [column, map, slicemap] .Code
 	Inner
 
 	// @gen list column

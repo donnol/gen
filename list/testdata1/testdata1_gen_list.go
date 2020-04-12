@@ -18,6 +18,24 @@ func (list ModelList) ColumnInnerCode() []string {
 	return result
 }
 
+// MapInnerCode InnerCode映射
+func (list ModelList) MapInnerCode() map[string]Model {
+	result := make(map[string]Model)
+	for _, single := range list {
+		result[single.Inner.Code] = single
+	}
+	return result
+}
+
+// MapListByInnerCode InnerCode数组映射
+func (list ModelList) MapListByInnerCode() map[string][]Model {
+	result := make(map[string][]Model)
+	for _, single := range list {
+		result[single.Inner.Code] = append(result[single.Inner.Code], single)
+	}
+	return result
+}
+
 // ColumnID ID列
 func (list ModelList) ColumnID() []int {
 	result := make([]int, len(list), len(list))
