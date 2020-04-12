@@ -327,8 +327,8 @@ func (info Info) GetTypesTypeStructField(fieldName string) (
 		if field.Name() != fieldName {
 			continue
 		}
-		typName = field.Type().String()
-		typNameWithPath = field.Type().String()
+		full := field.Type().String()
+		_, typName, typNameWithPath = getImportPathAndTypeName(full)
 	}
 
 	return

@@ -4,6 +4,7 @@ import (
 	"github.com/donnol/gen/list/testdata1/content"
 	"github.com/donnol/gen/list/testdata2"
 	"github.com/donnol/gen/list/testdata3"
+	"github.com/gofrs/uuid"
 )
 
 // ModelList 列表结构体
@@ -36,29 +37,29 @@ func (list ModelList) MapListByInnerCode() map[string][]Model {
 	return result
 }
 
-// ColumnBaseUUID BaseUUID列
-func (list ModelList) ColumnBaseUUID() []string {
-	result := make([]string, len(list), len(list))
+// ColumnBaseUUID2 BaseUUID2列
+func (list ModelList) ColumnBaseUUID2() []uuid.UUID {
+	result := make([]uuid.UUID, len(list), len(list))
 	for i, single := range list {
-		result[i] = single.Base.UUID
+		result[i] = single.Base.UUID2
 	}
 	return result
 }
 
-// MapBaseUUID BaseUUID映射
-func (list ModelList) MapBaseUUID() map[string]Model {
-	result := make(map[string]Model)
+// MapBaseUUID2 BaseUUID2映射
+func (list ModelList) MapBaseUUID2() map[uuid.UUID]Model {
+	result := make(map[uuid.UUID]Model)
 	for _, single := range list {
-		result[single.Base.UUID] = single
+		result[single.Base.UUID2] = single
 	}
 	return result
 }
 
-// MapListByBaseUUID BaseUUID数组映射
-func (list ModelList) MapListByBaseUUID() map[string][]Model {
-	result := make(map[string][]Model)
+// MapListByBaseUUID2 BaseUUID2数组映射
+func (list ModelList) MapListByBaseUUID2() map[uuid.UUID][]Model {
+	result := make(map[uuid.UUID][]Model)
 	for _, single := range list {
-		result[single.Base.UUID] = append(result[single.Base.UUID], single)
+		result[single.Base.UUID2] = append(result[single.Base.UUID2], single)
 	}
 	return result
 }

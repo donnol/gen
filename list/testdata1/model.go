@@ -14,7 +14,7 @@ type Model struct {
 	// @gen list [column, map, slicemap] .Code
 	Inner
 
-	// @gen list [column, map, slicemap] .UUID
+	// @gen list [column, map, slicemap] .UUID2
 	base.Base
 
 	// @gen list column
