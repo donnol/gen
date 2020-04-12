@@ -149,6 +149,8 @@ func (p *Parser) getStructDocAndComment(pkg string, parserPkg *ast.Package) (
 					astField, ok := field.Type.(*ast.Ident)
 					if ok {
 						fieldName = astField.Name
+					} else if selField, ok := field.Type.(*ast.SelectorExpr); ok {
+						fieldName = selField.Sel.Name
 					}
 				}
 				if fieldName == "" {

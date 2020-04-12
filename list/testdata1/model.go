@@ -3,6 +3,7 @@ package testdata1
 import (
 	"go/types"
 
+	"github.com/donnol/gen/list/testdata1/base"
 	"github.com/pkg/errors"
 )
 
@@ -12,6 +13,9 @@ import (
 type Model struct {
 	// @gen list [column, map, slicemap] .Code
 	Inner
+
+	// @gen list [column, map, slicemap] .UUID
+	base.Base
 
 	// @gen list column
 	// 唯一

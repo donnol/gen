@@ -36,6 +36,33 @@ func (list ModelList) MapListByInnerCode() map[string][]Model {
 	return result
 }
 
+// ColumnBaseUUID BaseUUID列
+func (list ModelList) ColumnBaseUUID() []string {
+	result := make([]string, len(list), len(list))
+	for i, single := range list {
+		result[i] = single.Base.UUID
+	}
+	return result
+}
+
+// MapBaseUUID BaseUUID映射
+func (list ModelList) MapBaseUUID() map[string]Model {
+	result := make(map[string]Model)
+	for _, single := range list {
+		result[single.Base.UUID] = single
+	}
+	return result
+}
+
+// MapListByBaseUUID BaseUUID数组映射
+func (list ModelList) MapListByBaseUUID() map[string][]Model {
+	result := make(map[string][]Model)
+	for _, single := range list {
+		result[single.Base.UUID] = append(result[single.Base.UUID], single)
+	}
+	return result
+}
+
 // ColumnID ID列
 func (list ModelList) ColumnID() []int {
 	result := make([]int, len(list), len(list))
