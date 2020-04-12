@@ -1,5 +1,8 @@
 github.com/donnol/tools v0.2.0 h1:u+fICCyycggOyBkwLZOdD24zgfO3NsrVmKFB0R2VisI=
 github.com/donnol/tools v0.2.0/go.mod h1:IfslEahF++Xu0Witj2OJabgv0RNzTVMSFl7hSYSySIk=
+github.com/gofrs/uuid v1.2.0 h1:coDhrjgyJaglxSjxuJdqQSSdUpG3w6p1OwN2od6frBU=
+github.com/gofrs/uuid v3.2.0+incompatible h1:y12jRkkFxsd7GpqdSZ+/KCs/fJbqpEXSGd4+jfEaewE=
+github.com/gofrs/uuid v3.2.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRxnplIgP/c0N/04lM=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
