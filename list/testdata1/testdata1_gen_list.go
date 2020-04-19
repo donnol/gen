@@ -29,8 +29,8 @@ func (list ModelList) MapInnerCode() map[string]Model {
 }
 
 // MapListByInnerCode InnerCode数组映射
-func (list ModelList) MapListByInnerCode() map[string][]Model {
-	result := make(map[string][]Model)
+func (list ModelList) MapListByInnerCode() map[string]ModelList {
+	result := make(map[string]ModelList, len(list))
 	for _, single := range list {
 		result[single.Inner.Code] = append(result[single.Inner.Code], single)
 	}
@@ -56,8 +56,8 @@ func (list ModelList) MapBaseUUID2() map[uuid.UUID]Model {
 }
 
 // MapListByBaseUUID2 BaseUUID2数组映射
-func (list ModelList) MapListByBaseUUID2() map[uuid.UUID][]Model {
-	result := make(map[uuid.UUID][]Model)
+func (list ModelList) MapListByBaseUUID2() map[uuid.UUID]ModelList {
+	result := make(map[uuid.UUID]ModelList, len(list))
 	for _, single := range list {
 		result[single.Base.UUID2] = append(result[single.Base.UUID2], single)
 	}
@@ -83,8 +83,8 @@ func (list ModelList) MapName() map[string]Model {
 }
 
 // MapListByName Name数组映射
-func (list ModelList) MapListByName() map[string][]Model {
-	result := make(map[string][]Model)
+func (list ModelList) MapListByName() map[string]ModelList {
+	result := make(map[string]ModelList, len(list))
 	for _, single := range list {
 		result[single.Name] = append(result[single.Name], single)
 	}
@@ -101,8 +101,8 @@ func (list ModelList) MapAge() map[float64]Model {
 }
 
 // MapListByAge Age数组映射
-func (list ModelList) MapListByAge() map[float64][]Model {
-	result := make(map[float64][]Model)
+func (list ModelList) MapListByAge() map[float64]ModelList {
+	result := make(map[float64]ModelList, len(list))
 	for _, single := range list {
 		result[single.Age] = append(result[single.Age], single)
 	}

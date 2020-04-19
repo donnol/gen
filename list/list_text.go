@@ -33,8 +33,8 @@ var mapMethodText = `
 // 列取数组映射方法定义
 var sliceMapMethodText = `
 	// MapListBy{{.fieldName}} {{.fieldName}}数组映射
-	func (list {{.typName}}List) MapListBy{{.fieldName}}() map[{{.fieldType}}][]{{.typNameWithPath}} {
-		result := make(map[{{.fieldType}}][]{{.typNameWithPath}})
+	func (list {{.typName}}List) MapListBy{{.fieldName}}() map[{{.fieldType}}]{{.typName}}List {
+		result := make(map[{{.fieldType}}]{{.typName}}List, len(list))
 		for _, single := range list {
 			result[single.{{.fieldNameWithInner}}] = append(result[single.{{.fieldNameWithInner}}], single)
 		}
