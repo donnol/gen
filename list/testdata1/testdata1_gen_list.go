@@ -7,6 +7,7 @@ import (
 	"github.com/donnol/gen/list/testdata2"
 	"github.com/donnol/gen/list/testdata3"
 	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 )
 
 // ModelList 列表结构体
@@ -302,5 +303,32 @@ func (list ModelList) JoinAddrByAddrIDEqualID(
 		result[i] = tmp
 	}
 
+	return result
+}
+
+// ColumnMapValueMap MapValueMap列
+func (list ModelList) ColumnMapValueMap() []map[string]map[string]int {
+	result := make([]map[string]map[string]int, len(list), len(list))
+	for i, single := range list {
+		result[i] = single.MapValueMap
+	}
+	return result
+}
+
+// ColumnOutMapValueMap OutMapValueMap列
+func (list ModelList) ColumnOutMapValueMap() []map[errors.Frame]map[errors.Frame]errors.Frame {
+	result := make([]map[errors.Frame]map[errors.Frame]errors.Frame, len(list), len(list))
+	for i, single := range list {
+		result[i] = single.OutMapValueMap
+	}
+	return result
+}
+
+// ColumnOutMapValueSlice OutMapValueSlice列
+func (list ModelList) ColumnOutMapValueSlice() []map[errors.Frame][]errors.Frame {
+	result := make([]map[errors.Frame][]errors.Frame, len(list), len(list))
+	for i, single := range list {
+		result[i] = single.OutMapValueSlice
+	}
 	return result
 }

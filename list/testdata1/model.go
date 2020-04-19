@@ -61,6 +61,14 @@ type Model struct {
 	OutMap3    map[types.Type]errors.Frame
 	OutPointer *errors.Frame
 	OutSlice   []errors.Frame
+
+	// map的value还是map
+	// @gen list column
+	MapValueMap map[string]map[string]int
+	// @gen list column
+	OutMapValueMap map[errors.Frame]map[errors.Frame]errors.Frame
+	// @gen list column
+	OutMapValueSlice map[errors.Frame][]errors.Frame
 }
 
 // Inner 内嵌

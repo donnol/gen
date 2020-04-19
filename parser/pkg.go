@@ -349,73 +349,79 @@ func (info Info) GetImportPathAndTypeName(typesType types.Type) (
 // 或从[4]github.com/pkg/errors.Frame解析出[4]errors.Frame
 // 或从map[github.com/pkg/errors.Frame]github.com/pkg/errors.Frame解析出map[errors.Frame]errors.Frame
 func GetImportPathAndTypeNameFromTypesType(typesType types.Type) (string, string, string) {
+	var importPath, typeName, typNameWithPath string
 	full := typesType.String()
-	importPath, typeName, typNameWithPath := getImportPathAndTypeName(full)
 
 	switch v := typesType.(type) {
 	case *types.Array:
 		debug("Array: %+v, %+v, %d\n", v, v.Elem(), v.Len())
 
-		elemTypName := v.Elem().String()
-		importPath, typeName, typNameWithPath = getImportPathAndTypeName(elemTypName)
+		elem := v.Elem()
+		importPath, typeName, typNameWithPath = GetImportPathAndTypeNameFromTypesType(elem)
 		prefix := "[" + strconv.Itoa(int(v.Len())) + "]"
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
 
-	case *types.Basic:
-		debug("Basic: %+v, %+v\n", v, v.Info())
-
 	case *types.Chan:
 		debug("Chan: %+v, %+v\n", v, v.Elem())
 
-		elemTypName := v.Elem().String()
-		importPath, typeName, typNameWithPath = getImportPathAndTypeName(elemTypName)
+		elem := v.Elem()
+		importPath, typeName, typNameWithPath = GetImportPathAndTypeNameFromTypesType(elem)
 		prefix := "chan "
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
 
-	case *types.Interface:
-		debug("Interface: %+v, %+v\n", v, v.NumMethods())
-
 	case *types.Map:
 		debug("Map: %+v, %+v\n", v, v.Elem())
 
-		elemTypName := v.Elem().String()
-		importPath, typeName, typNameWithPath = getImportPathAndTypeName(elemTypName)
+		elem := v.Elem()
+		importPath, typeName, typNameWithPath = GetImportPathAndTypeNameFromTypesType(elem)
 		_, _, keyTypNameWithPath := getImportPathAndTypeName(v.Key().String())
 		prefix := "map[" + keyTypNameWithPath + "] "
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
 
-	case *types.Named:
-		debug("Named: %+v, %+v\n", v, v.NumMethods())
-
 	case *types.Pointer:
 		debug("Pointer: %+v, %+v\n", v, v.Elem())
 
-		elemTypName := v.Elem().String()
-		importPath, typeName, typNameWithPath = getImportPathAndTypeName(elemTypName)
+		elem := v.Elem()
+		importPath, typeName, typNameWithPath = GetImportPathAndTypeNameFromTypesType(elem)
 		prefix := "*"
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
 
-	case *types.Signature:
-		debug("Signature: %+v, %+v\n", v, v.Params())
-
 	case *types.Slice:
 		debug("Slice: %+v, %+v\n", v, v.Elem())
 
-		elemTypName := v.Elem().String()
-		importPath, typeName, typNameWithPath = getImportPathAndTypeName(elemTypName)
+		elem := v.Elem()
+		importPath, typeName, typNameWithPath = GetImportPathAndTypeNameFromTypesType(elem)
 		prefix := "[]"
 		typeName = prefix + typeName
 		typNameWithPath = prefix + typNameWithPath
 
+	case *types.Basic:
+		debug("Basic: %+v, %+v\n", v, v.Info())
+		importPath, typeName, typNameWithPath = getImportPathAndTypeName(full)
+
+	case *types.Interface:
+		debug("Interface: %+v, %+v\n", v, v.NumMethods())
+		importPath, typeName, typNameWithPath = getImportPathAndTypeName(full)
+
+	case *types.Named:
+		debug("Named: %+v, %+v\n", v, v.NumMethods())
+		importPath, typeName, typNameWithPath = getImportPathAndTypeName(full)
+
+	case *types.Signature:
+		debug("Signature: %+v, %+v\n", v, v.Params())
+		importPath, typeName, typNameWithPath = getImportPathAndTypeName(full)
+
 	case *types.Struct:
 		debug("Struct: %+v, %+v\n", v, v.NumFields())
+		importPath, typeName, typNameWithPath = getImportPathAndTypeName(full)
 
 	case *types.Tuple:
 		debug("Tuple: %+v, %+v\n", v, v.Len())
+		importPath, typeName, typNameWithPath = getImportPathAndTypeName(full)
 
 	}
 
