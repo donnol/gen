@@ -1,6 +1,8 @@
 package testdata1
 
 import (
+	"sort"
+
 	"github.com/donnol/gen/list/testdata1/content"
 	"github.com/donnol/gen/list/testdata2"
 	"github.com/donnol/gen/list/testdata3"
@@ -9,6 +11,80 @@ import (
 
 // ModelList 列表结构体
 type ModelList []Model
+
+// Where 返回符合条件的行
+func (list ModelList) Where(f func(u Model) bool) ModelList {
+	result := make(ModelList, 0, len(list))
+	for _, single := range list {
+		if !f(single) {
+			continue
+		}
+		result = append(result, single)
+	}
+	return result
+}
+
+// Sort 排序
+func (list ModelList) Sort(f func(i, j int) bool) ModelList {
+	sort.Slice(list, f)
+	return list
+}
+
+// Limit 获取从offset位置开始的前几个
+func (list ModelList) Limit(offset, n int) ModelList {
+	l := len(list)
+	result := make(ModelList, 0, l)
+
+	if offset < 0 || offset >= l {
+		return result
+	}
+	if n > l-offset {
+		n = l - offset
+	}
+	for i := offset; i < offset+n; i++ {
+		result = append(result, list[i])
+	}
+
+	return result
+}
+
+// Reduce 降维，从数组变为单个
+func (list ModelList) Reduce(f func(u Model, nu Model) Model) Model {
+	var u Model
+	for i, nu := range list {
+		if i == 0 {
+			u = nu
+			continue
+		}
+		u = f(u, nu)
+	}
+	return u
+}
+
+// Reverse 反转
+func (list ModelList) Reverse() ModelList {
+	result := make(ModelList, 0, len(list))
+	for i := len(list) - 1; i >= 0; i-- {
+		result = append(result, list[i])
+	}
+	return result
+}
+
+// First 取首个
+func (list ModelList) First() Model {
+	if len(list) == 0 {
+		return Model{}
+	}
+	return list[0]
+}
+
+// Last 取最后一个，如果没有数据，会返回结构体零值
+func (list ModelList) Last() Model {
+	if len(list) == 0 {
+		return Model{}
+	}
+	return list[len(list)-1]
+}
 
 // ColumnInnerCode InnerCode列
 func (list ModelList) ColumnInnerCode() []string {

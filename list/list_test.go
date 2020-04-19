@@ -74,4 +74,84 @@ func TestListGenResult(t *testing.T) {
 	if !reflect.DeepEqual(dur, durwant) {
 		t.Fatalf("Bad result: %+v != %+v\n", jur, jurwant)
 	}
+
+	wherer := ml.Where(func(m testdata1.Model) bool {
+		if m.Name == "jd" {
+			return false
+		}
+		return true
+	})
+	if len(wherer) != 0 {
+		t.Fatalf("len isn't 0, %+v\n", wherer)
+	}
+
+	ml1 := testdata1.ModelList{
+		{ID: 1, Name: "jd", Age: 31.0, UserID: 1, ContentID: 1, ModelID: 1, AddrID: 1},
+		{ID: 2, Name: "je", Age: 21.0, UserID: 2, ContentID: 2, ModelID: 2, AddrID: 2},
+	}
+	ml1.Sort(func(i, j int) bool {
+		return ml1[i].ID > ml1[j].ID
+	})
+	sortwant := testdata1.ModelList{
+		{ID: 2, Name: "je", Age: 21.0, UserID: 2, ContentID: 2, ModelID: 2, AddrID: 2},
+		{ID: 1, Name: "jd", Age: 31.0, UserID: 1, ContentID: 1, ModelID: 1, AddrID: 1},
+	}
+	if !reflect.DeepEqual(ml1, sortwant) {
+		t.Fatalf("Bad result: %+v != %+v\n", ml1, sortwant)
+	}
+
+	ml1limit := ml1.Limit(0, 1)
+	limitwant := testdata1.ModelList{
+		{ID: 2, Name: "je", Age: 21.0, UserID: 2, ContentID: 2, ModelID: 2, AddrID: 2},
+	}
+	if !reflect.DeepEqual(ml1limit, limitwant) {
+		t.Fatalf("Bad result: %+v != %+v\n", ml1limit, limitwant)
+	}
+
+	ml1limit = ml1.Limit(1, 1)
+	limitwant = testdata1.ModelList{
+		{ID: 1, Name: "jd", Age: 31.0, UserID: 1, ContentID: 1, ModelID: 1, AddrID: 1},
+	}
+	if !reflect.DeepEqual(ml1limit, limitwant) {
+		t.Fatalf("Bad result: %+v != %+v\n", ml1limit, limitwant)
+	}
+
+	ml1limit = ml1.Limit(1, 2)
+	limitwant = testdata1.ModelList{
+		{ID: 1, Name: "jd", Age: 31.0, UserID: 1, ContentID: 1, ModelID: 1, AddrID: 1},
+	}
+	if !reflect.DeepEqual(ml1limit, limitwant) {
+		t.Fatalf("Bad result: %+v != %+v\n", ml1limit, limitwant)
+	}
+
+	ml1reduce := ml1.Reduce(func(u testdata1.Model, nu testdata1.Model) testdata1.Model {
+		return testdata1.Model{
+			ID: u.ID + nu.ID,
+		}
+	})
+	reducewant := testdata1.Model{ID: 3, Name: "", Age: 0.0, UserID: 0, ContentID: 0, ModelID: 0, AddrID: 0}
+	if !reflect.DeepEqual(ml1reduce, reducewant) {
+		t.Fatalf("Bad result: %+v != %+v\n", ml1reduce, reducewant)
+	}
+
+	ml1reverse := ml1.Reverse()
+	reversewant := testdata1.ModelList{
+		{ID: 1, Name: "jd", Age: 31.0, UserID: 1, ContentID: 1, ModelID: 1, AddrID: 1},
+		{ID: 2, Name: "je", Age: 21.0, UserID: 2, ContentID: 2, ModelID: 2, AddrID: 2},
+	}
+	if !reflect.DeepEqual(ml1reverse, reversewant) {
+		t.Fatalf("Bad result: %+v != %+v\n", ml1reverse, reversewant)
+	}
+
+	ml1first := ml1.First()
+	firstwant := testdata1.Model{ID: 2, Name: "je", Age: 21.0, UserID: 2, ContentID: 2, ModelID: 2, AddrID: 2}
+	if !reflect.DeepEqual(ml1first, firstwant) {
+		t.Fatalf("Bad result: %+v != %+v\n", ml1first, firstwant)
+	}
+
+	ml1last := ml1.Last()
+	lastwant := testdata1.Model{ID: 1, Name: "jd", Age: 31.0, UserID: 1, ContentID: 1, ModelID: 1, AddrID: 1}
+	if !reflect.DeepEqual(ml1last, lastwant) {
+		t.Fatalf("Bad result: %+v != %+v\n", ml1last, lastwant)
+	}
 }

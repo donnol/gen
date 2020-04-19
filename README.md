@@ -88,7 +88,7 @@ where, 返回符合条件的行；签名：`func(list UserList) Where(f func(u U
 
 sort, 排序；签名：`func(list UserList) Sort(f func(i, j int) bool ) UserList`
 
-limit, 前几个；签名：`func(list UserList) Limit(n int) UserList`
+limit, 从offset位置开始的前几个；签名：`func(list UserList) Limit(offset, n int) UserList`
 
 group, 按指定条件分组，跟slicemap类似，TODO:
 

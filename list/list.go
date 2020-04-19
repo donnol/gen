@@ -102,11 +102,22 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 		}
 		if singleStruct.Info.Commands.ExistCommand(commandName) ||
 			existFieldCommand {
-			if err := list.template.Execute(buf, "List", typText, map[string]interface{}{
-				"typName":         structName,
-				"typNameWithPath": typNameWithPath,
-			}); err != nil {
-				return pkgName, importPathMap, content, errors.WithStack(err)
+			for _, text := range []string{
+				typText,
+				whereMethodText,
+				sortMethodText,
+				limitMethodText,
+				reduceMethodText,
+				reverseMethodText,
+				firstMethodText,
+				lastMethodText,
+			} {
+				if err := list.template.Execute(buf, "List", text, map[string]interface{}{
+					"typName":         structName,
+					"typNameWithPath": typNameWithPath,
+				}); err != nil {
+					return pkgName, importPathMap, content, errors.WithStack(err)
+				}
 			}
 		}
 
