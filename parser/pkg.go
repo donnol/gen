@@ -229,7 +229,7 @@ func (info *Info) InitWithTypes(name, pkgPath, doc, comment string, typ types.Ty
 	info.initCommandsFromDoc()
 
 	// 路径等信息
-	importPath, typName, typNameWithPath := info.GetImportPathAndTypeName(typ.String())
+	importPath, typName, typNameWithPath := info.GetImportPathAndTypeName(typ)
 	if info.ImportPath == "" {
 		info.ImportPath = importPath
 	}
@@ -327,22 +327,32 @@ func (info Info) GetTypesTypeStructField(fieldName string) (
 		if field.Name() != fieldName {
 			continue
 		}
-		full := field.Type().String()
-		_, typName, typNameWithPath = getImportPathAndTypeName(full)
+		_, typName, typNameWithPath = info.GetImportPathAndTypeName(field.Type())
 	}
 
 	return
 }
 
 // GetImportPathAndTypeName 获取导入路径和类型名称
-func (info *Info) GetImportPathAndTypeName(full string) (
+func (info Info) GetImportPathAndTypeName(typesType types.Type) (
 	string,
 	string,
 	string,
 ) {
+	return GetImportPathAndTypeNameFromTypesType(typesType)
+}
+
+// GetImportPathAndTypeNameFromTypesType 从types.Type解析出导入路径、类型名称、带短路径的类型
+// 获取带path类型 如从github.com/pkg/errors.Frame解析出errors.Frame
+// 或从*github.com/pkg/errors.Frame解析出*errors.Frame
+// 或从[]github.com/pkg/errors.Frame解析出[]errors.Frame
+// 或从[4]github.com/pkg/errors.Frame解析出[4]errors.Frame
+// 或从map[github.com/pkg/errors.Frame]github.com/pkg/errors.Frame解析出map[errors.Frame]errors.Frame
+func GetImportPathAndTypeNameFromTypesType(typesType types.Type) (string, string, string) {
+	full := typesType.String()
 	importPath, typeName, typNameWithPath := getImportPathAndTypeName(full)
 
-	switch v := info.TypesType.(type) {
+	switch v := typesType.(type) {
 	case *types.Array:
 		debug("Array: %+v, %+v, %d\n", v, v.Elem(), v.Len())
 
@@ -412,10 +422,15 @@ func (info *Info) GetImportPathAndTypeName(full string) (
 	return importPath, typeName, typNameWithPath
 }
 
+// getImportPathAndTypeName 解析类型获取带path类型
 func getImportPathAndTypeName(full string) (string, string, string) {
 	importPath := ""
 	typeName := full
 	typNameWithPath := full
+
+	defer func() {
+		collectTypeCase(full, importPath, typeName, typNameWithPath)
+	}()
 
 	// 带有包导入路径
 	typLastIndex := strings.LastIndex(full, ".")
@@ -434,6 +449,13 @@ func getImportPathAndTypeName(full string) (string, string, string) {
 	}
 
 	return importPath, typeName, typNameWithPath
+}
+
+// ## 收集类型 在解析过程中，插入collectTypeCase方法，收集输入类型和输出类型，保存到指定文件里，方便后续查看对比。
+func collectTypeCase(full, importPath, typeName, typNameWithPath string) {
+	if v := os.Getenv("debug"); v != "" {
+		fmt.Printf("=== collectTypeCase: %s, %s, %s, %s\n", full, importPath, typeName, typNameWithPath)
+	}
 }
 
 // ImportPathMap 路径映射
