@@ -75,6 +75,40 @@ type User struct {
 
 给定一个结构体，生成相应的列表结构体，并在列表结构体上生成方法。方法包括取列，列映射，列数组映射等
 
+```go
+column, 取列，ID列或Name列；签名：`func(list UserList) ColumnID() []int`
+
+map, 以列作映射；签名：`func(list UserList) MapID() map[int]User`
+
+slicemap/listmap, 以列作列表映射；签名：`func(list UserList) MapListByID() map[int]UserList`
+
+select, TODO:
+
+where, 返回符合条件的行；签名：`func(list UserList) Where(f func(u User) bool ) UserList`
+
+sort, 排序；签名：`func(list UserList) Sort(f func(i, j int) bool ) UserList`
+
+limit, 前几个；签名：`func(list UserList) Limit(n int) UserList`
+
+group, 按指定条件分组，跟slicemap类似，TODO:
+
+reduce, 降维，从数组变为单个，对数组中的每个元素执行函数(升序执行)，将其结果汇总为单个返回值；签名：`func(list UserList) Reduce(f func(u User, nu User) User) User`
+
+sum, 对某列求和，可用reduce实现
+
+max, 取某列最大的行，可用reduce实现
+
+min, 取某列最小的行，可用reduce实现
+
+reverse, 反转；签名：`func(list UserList) Reverse() UserList`
+
+distinct, 唯一，以指定字段为比较条件；签名：`func(list UserList) DistinctName() UserList`
+
+first, 取首个；签名：`func(list UserList) First() User`
+
+last, 取最后一个；签名：`func(list UserList) Last() User`
+```
+
 如：
 
 给定结构体：
