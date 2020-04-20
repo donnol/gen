@@ -33,6 +33,12 @@ func main() {
 	flag.BoolVar(&rFlag, "r", false, "recursive parse dir")
 	var excludeFlags excludeFlags
 	flag.Var(&excludeFlags, "exclude", "exclude dir")
+	var typ string
+	flag.StringVar(&typ, "type", "", "specify type with path, like: github.com/pkg/errors.Frame")
+	var field string
+	flag.StringVar(&field, "field", "", "specify field in the struct, like: ID")
+	var saveToFile bool
+	flag.BoolVar(&saveToFile, "w", false, "save to file")
 	flag.Parse()
 	fmt.Printf("recursive: %v, exclude: %+v\n", rFlag, excludeFlags)
 
@@ -42,6 +48,11 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("dir: %s\n", dir)
+
+	// TODO:
+	// 指定了结构体，则不需要遍历目录，解析type内容，如果有包路径则找路径内的结构体信息，如果没有包路径则直接在当前目录找结构体信息
+	// 如果还指定了field，则对field做指定操作
+	// w选项控制是否保存在本文件
 
 	// 解析目录里的go.mod文件，获取模块名
 	modfilePath := filepath.Join(dir, "go.mod")
