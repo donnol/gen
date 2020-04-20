@@ -49,7 +49,7 @@ var sliceMapMethodText = `
 // where, 返回符合条件的行
 var whereMethodText = `
 	// Where 返回符合条件的行
-	func (list {{.typName}}List) Where(f func(u {{.typName}}) bool) {{.typName}}List {
+	func (list {{.typName}}List) Where(f func(u {{.typNameWithPath}}) bool) {{.typName}}List {
 		result := make({{.typName}}List, 0, len(list))
 		for _, single := range list {
 			if !f(single) {
@@ -102,8 +102,8 @@ var limitMethodText = `
 // reduce, 降维，从数组变为单个，对数组中的每个元素执行函数(升序执行)，将其结果汇总为单个返回值
 var reduceMethodText = `
 	// Reduce 降维，从数组变为单个
-	func (list {{.typName}}List) Reduce(f func(u {{.typName}}, nu {{.typName}}) {{.typName}}) {{.typName}} {
-		var u {{.typName}}
+	func (list {{.typName}}List) Reduce(f func(u {{.typNameWithPath}}, nu {{.typNameWithPath}}) {{.typNameWithPath}}) {{.typNameWithPath}} {
+		var u {{.typNameWithPath}}
 		for i, nu := range list {
 			if i == 0 {
 				u = nu
@@ -130,9 +130,9 @@ var reverseMethodText = `
 // first, 取首个，如果没有数据，会返回结构体零值
 var firstMethodText = `
 	// First 取首个
-	func (list {{.typName}}List) First() {{.typName}} {
+	func (list {{.typName}}List) First() {{.typNameWithPath}} {
 		if len(list) == 0 {
-			return {{.typName}}{}
+			return {{.typNameWithPath}}{}
 		}
 		return list[0]
 	}
@@ -141,9 +141,9 @@ var firstMethodText = `
 // last, 取最后一个，如果没有数据，会返回结构体零值
 var lastMethodText = `
 	// Last 取最后一个，如果没有数据，会返回结构体零值
-	func (list {{.typName}}List) Last() {{.typName}} {
+	func (list {{.typName}}List) Last() {{.typNameWithPath}} {
 		if len(list) == 0 {
-			return {{.typName}}{}
+			return {{.typNameWithPath}}{}
 		}
 		return list[len(list)-1]
 	}
