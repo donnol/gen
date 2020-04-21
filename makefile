@@ -22,7 +22,7 @@ build:
 	$(gov) install
 
 gen:install build
-	gen -r -exclude=.git -exclude=.idea -exclude=.vscode
+	gen -r --exclude=.git --exclude=.idea --exclude=.vscode
 
 # 通过git log查看文件的修改时间
 file=xxx

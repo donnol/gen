@@ -1,9 +1,9 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,13 +11,14 @@ import (
 	"github.com/donnol/gen/list"
 	"github.com/donnol/gen/parser"
 	"github.com/donnol/gen/template"
+	"github.com/spf13/cobra"
 	"golang.org/x/mod/modfile"
 )
 
 type excludeFlags []string
 
 func (i *excludeFlags) String() string {
-	return "my string representation"
+	return "exclude dir"
 }
 
 func (i *excludeFlags) Set(value string) error {
@@ -25,21 +26,38 @@ func (i *excludeFlags) Set(value string) error {
 	return nil
 }
 
+func (i *excludeFlags) Type() string {
+	return ""
+}
+
+var (
+	rootCmd = cobra.Command{
+		Use:   "gen",
+		Short: "a tool for code generate",
+		Long:  "gen struct list method, like: ColumnXXX etc.",
+		Run: func(cmd *cobra.Command, args []string) {
+		},
+	}
+)
+
 func main() {
 	fmt.Printf("Gen is a tool for code generate.\n")
 
 	// 解析标签
 	var rFlag bool
-	flag.BoolVar(&rFlag, "r", false, "recursive parse dir")
+	rootCmd.PersistentFlags().BoolVarP(&rFlag, "r", "r", false, "recursive parse dir")
 	var excludeFlags excludeFlags
-	flag.Var(&excludeFlags, "exclude", "exclude dir")
+	rootCmd.PersistentFlags().VarP(&excludeFlags, "exclude", "e", "exclude dir")
 	var typ string
-	flag.StringVar(&typ, "type", "", "specify type with path, like: github.com/pkg/errors.Frame")
+	rootCmd.PersistentFlags().StringVarP(&typ, "type", "t", "", "specify type with path, like: github.com/pkg/errors.Frame")
 	var field string
-	flag.StringVar(&field, "field", "", "specify field in the struct, like: ID")
+	rootCmd.PersistentFlags().StringVarP(&field, "field", "f", "", "specify field in the struct, like: ID")
 	var saveToFile bool
-	flag.BoolVar(&saveToFile, "w", false, "save to file")
-	flag.Parse()
+	rootCmd.PersistentFlags().BoolVar(&saveToFile, "w", false, "save to file")
+
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("recursive: %v, exclude: %+v\n", rFlag, excludeFlags)
 
 	// 获取目录
