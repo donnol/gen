@@ -21,8 +21,14 @@ build:
 	cd cmd/gen && \
 	$(gov) install
 
+# 遍历目录，寻找@gen标志结构体，生成方法
 gen:install build
-	gen -r --exclude=.git --exclude=.idea --exclude=.vscode
+	gen list -r --exclude=.git --exclude=.idea --exclude=.vscode
+
+# 指定类型，生成方法
+gen_spec_type:install build
+	gen list --type=github.com/donnol/gen/list/testdata1.Model \
+		--method='where;sort;limit;reduce;column(ID,Name,Age);map(ID,Name,Age);slicemap(ID,Name,Age);listmap(ID,Name,Age)'
 
 # 通过git log查看文件的修改时间
 file=xxx

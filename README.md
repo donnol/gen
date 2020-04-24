@@ -206,4 +206,4 @@ func (list ModelList) ColumnIDAndName() struct{
 
 ## TODO:
 
-- [ ] gen 命令支持更多 flag，如-type 指定类型，-field 指定字段，-w 保存内容到本文件等。
+- [ ] gen 命令支持更多 flag，如-type 指定类型，-w 保存内容到本文件等
