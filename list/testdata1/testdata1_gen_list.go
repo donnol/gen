@@ -1,7 +1,9 @@
 package testdata1
 
 import (
+	"math/rand"
 	"sort"
+	"time"
 
 	"github.com/donnol/gen/list/testdata1/content"
 	"github.com/donnol/gen/list/testdata2"
@@ -23,6 +25,11 @@ func (list ModelList) Where(f func(u Model) bool) ModelList {
 		result = append(result, single)
 	}
 	return result
+}
+
+// Len 长度
+func (list ModelList) Len() int {
+	return len(list)
 }
 
 // Sort 排序
@@ -49,6 +56,15 @@ func (list ModelList) Limit(offset, n int) ModelList {
 	return result
 }
 
+// Map 对列表里的每个元素执行指定操作
+func (list ModelList) Map(f func(u Model) Model) ModelList {
+	r := make(ModelList, 0, len(list))
+	for _, single := range list {
+		r = append(r, f(single))
+	}
+	return r
+}
+
 // Reduce 降维，从数组变为单个
 func (list ModelList) Reduce(f func(u Model, nu Model) Model) Model {
 	var u Model
@@ -60,6 +76,25 @@ func (list ModelList) Reduce(f func(u Model, nu Model) Model) Model {
 		u = f(u, nu)
 	}
 	return u
+}
+
+// Each 逐个元素遍历
+func (list ModelList) Each(f func(u Model, i int)) {
+	for i, single := range list {
+		f(single, i)
+	}
+}
+
+// Shuffle 洗牌
+func (list ModelList) Shuffle() ModelList {
+	r := make(ModelList, len(list))
+	copy(r, list)
+	ras := rand.NewSource(time.Now().Unix())
+	ra := rand.New(ras)
+	ra.Shuffle(len(r), func(i, j int) {
+		r[i], r[j] = r[j], r[i]
+	})
+	return r
 }
 
 // Reverse 反转
@@ -89,15 +124,15 @@ func (list ModelList) Last() Model {
 
 // ColumnInnerCode InnerCode列
 func (list ModelList) ColumnInnerCode() []string {
-	result := make([]string, len(list), len(list))
+	result := make([]string, len(list))
 	for i, single := range list {
 		result[i] = single.Inner.Code
 	}
 	return result
 }
 
-// MapInnerCode InnerCode映射
-func (list ModelList) MapInnerCode() map[string]Model {
+// MapByInnerCode InnerCode映射
+func (list ModelList) MapByInnerCode() map[string]Model {
 	result := make(map[string]Model)
 	for _, single := range list {
 		result[single.Inner.Code] = single
@@ -116,15 +151,15 @@ func (list ModelList) MapListByInnerCode() map[string]ModelList {
 
 // ColumnBaseUUID2 BaseUUID2列
 func (list ModelList) ColumnBaseUUID2() []uuid.UUID {
-	result := make([]uuid.UUID, len(list), len(list))
+	result := make([]uuid.UUID, len(list))
 	for i, single := range list {
 		result[i] = single.Base.UUID2
 	}
 	return result
 }
 
-// MapBaseUUID2 BaseUUID2映射
-func (list ModelList) MapBaseUUID2() map[uuid.UUID]Model {
+// MapByBaseUUID2 BaseUUID2映射
+func (list ModelList) MapByBaseUUID2() map[uuid.UUID]Model {
 	result := make(map[uuid.UUID]Model)
 	for _, single := range list {
 		result[single.Base.UUID2] = single
@@ -143,15 +178,15 @@ func (list ModelList) MapListByBaseUUID2() map[uuid.UUID]ModelList {
 
 // ColumnID ID列
 func (list ModelList) ColumnID() []int {
-	result := make([]int, len(list), len(list))
+	result := make([]int, len(list))
 	for i, single := range list {
 		result[i] = single.ID
 	}
 	return result
 }
 
-// MapName Name映射
-func (list ModelList) MapName() map[string]Model {
+// MapByName Name映射
+func (list ModelList) MapByName() map[string]Model {
 	result := make(map[string]Model)
 	for _, single := range list {
 		result[single.Name] = single
@@ -168,8 +203,8 @@ func (list ModelList) MapListByName() map[string]ModelList {
 	return result
 }
 
-// MapAge Age映射
-func (list ModelList) MapAge() map[float64]Model {
+// MapByAge Age映射
+func (list ModelList) MapByAge() map[float64]Model {
 	result := make(map[float64]Model)
 	for _, single := range list {
 		result[single.Age] = single
@@ -200,7 +235,7 @@ func (list ModelList) JoinUserByUserIDEqualID(
 		oMap[single.ID] = single
 	}
 
-	result := make(ModelList, len(list), len(list))
+	result := make(ModelList, len(list))
 	for i, single := range list {
 		tmp := f(single, oMap[single.UserID])
 
@@ -224,7 +259,7 @@ func (list ModelList) DeriveByUserIDEqualID(
 		oMap[single.ID] = single
 	}
 
-	result := make([]ModelUser, len(list), len(list))
+	result := make([]ModelUser, len(list))
 	for i, single := range list {
 		tmp := f(single, oMap[single.UserID])
 
@@ -248,7 +283,7 @@ func (list ModelList) JoinContentByContentIDEqualID(
 		oMap[single.ID] = single
 	}
 
-	result := make(ModelList, len(list), len(list))
+	result := make(ModelList, len(list))
 	for i, single := range list {
 		tmp := f(single, oMap[single.ContentID])
 
@@ -272,7 +307,7 @@ func (list ModelList) JoinModelByModelIDEqualID(
 		oMap[single.ID] = single
 	}
 
-	result := make(ModelList, len(list), len(list))
+	result := make(ModelList, len(list))
 	for i, single := range list {
 		tmp := f(single, oMap[single.ModelID])
 
@@ -296,7 +331,7 @@ func (list ModelList) JoinAddrByAddrIDEqualID(
 		oMap[single.ID] = single
 	}
 
-	result := make(ModelList, len(list), len(list))
+	result := make(ModelList, len(list))
 	for i, single := range list {
 		tmp := f(single, oMap[single.AddrID])
 
@@ -308,7 +343,7 @@ func (list ModelList) JoinAddrByAddrIDEqualID(
 
 // ColumnMapValueMap MapValueMap列
 func (list ModelList) ColumnMapValueMap() []map[string]map[string]int {
-	result := make([]map[string]map[string]int, len(list), len(list))
+	result := make([]map[string]map[string]int, len(list))
 	for i, single := range list {
 		result[i] = single.MapValueMap
 	}
@@ -317,7 +352,7 @@ func (list ModelList) ColumnMapValueMap() []map[string]map[string]int {
 
 // ColumnOutMapValueMap OutMapValueMap列
 func (list ModelList) ColumnOutMapValueMap() []map[errors.Frame]map[errors.Frame]errors.Frame {
-	result := make([]map[errors.Frame]map[errors.Frame]errors.Frame, len(list), len(list))
+	result := make([]map[errors.Frame]map[errors.Frame]errors.Frame, len(list))
 	for i, single := range list {
 		result[i] = single.OutMapValueMap
 	}
@@ -326,7 +361,7 @@ func (list ModelList) ColumnOutMapValueMap() []map[errors.Frame]map[errors.Frame
 
 // ColumnOutMapValueSlice OutMapValueSlice列
 func (list ModelList) ColumnOutMapValueSlice() []map[errors.Frame][]errors.Frame {
-	result := make([]map[errors.Frame][]errors.Frame, len(list), len(list))
+	result := make([]map[errors.Frame][]errors.Frame, len(list))
 	for i, single := range list {
 		result[i] = single.OutMapValueSlice
 	}

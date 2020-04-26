@@ -37,7 +37,7 @@ func TestListGenResult(t *testing.T) {
 		t.Fatalf("Bad result: %+v != %+v\n", cr, cwant)
 	}
 
-	mr := ml.MapName()
+	mr := ml.MapByName()
 	mwant := map[string]testdata1.Model{"jd": ml[0]}
 	if !reflect.DeepEqual(mr, mwant) {
 		t.Fatalf("Bad result: %+v != %+v\n", mr, mwant)

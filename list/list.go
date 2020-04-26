@@ -105,9 +105,13 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 			for _, text := range []string{
 				typText,
 				whereMethodText,
+				lenMethodText,
 				sortMethodText,
 				limitMethodText,
+				mapMethodText,
 				reduceMethodText,
+				eachMethodText,
+				shuffleMethodText,
 				reverseMethodText,
 				firstMethodText,
 				lastMethodText,
@@ -152,7 +156,7 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 					attr string
 					text string
 				}{
-					{attrMap, mapMethodText},           // 列取映射
+					{attrMap, mapByMethodText},         // 列取映射
 					{attrSliceMap, sliceMapMethodText}, // 列取数组映射
 				} {
 					if singleField.Info.Commands.ExistCommandAttr(commandName, parser.Attr(methodText.attr)) {

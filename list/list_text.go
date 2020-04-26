@@ -10,7 +10,7 @@ var typText = `
 var columnMethodText = `
 	// Column{{.fieldName}} {{.fieldName}}列
 	func (list {{.typName}}List) Column{{.fieldName}}() []{{.fieldType}} {
-		result := make([]{{.fieldType}}, len(list), len(list))
+		result := make([]{{.fieldType}}, len(list))
 		for i, single := range list {
 			result[i] = single.{{.fieldNameWithInner}}
 		}
@@ -19,9 +19,9 @@ var columnMethodText = `
 	`
 
 // 列取映射方法定义
-var mapMethodText = `
-	// Map{{.fieldName}} {{.fieldName}}映射
-	func (list {{.typName}}List) Map{{.fieldName}}() map[{{.fieldType}}]{{.typNameWithPath}} {
+var mapByMethodText = `
+	// MapBy{{.fieldName}} {{.fieldName}}映射
+	func (list {{.typName}}List) MapBy{{.fieldName}}() map[{{.fieldType}}]{{.typNameWithPath}} {
 		result := make(map[{{.fieldType}}]{{.typNameWithPath}})
 		for _, single := range list {
 			result[single.{{.fieldNameWithInner}}] = single
@@ -99,6 +99,18 @@ var limitMethodText = `
 	}
 	`
 
+// map，对列表里的每个元素执行指定操作
+var mapMethodText = `
+	// Map 对列表里的每个元素执行指定操作
+	func(list {{.typName}}List) Map(f func(u {{.typNameWithPath}}) {{.typNameWithPath}} ) {{.typName}}List {
+		r := make({{.typName}}List, 0, len(list))
+		for _, single := range list {
+			r = append(r, f(single))
+		}
+		return r
+	}
+	`
+
 // reduce, 降维，从数组变为单个，对数组中的每个元素执行函数(升序执行)，将其结果汇总为单个返回值
 var reduceMethodText = `
 	// Reduce 降维，从数组变为单个
@@ -112,6 +124,31 @@ var reduceMethodText = `
 			u = f(u, nu)
 		}
 		return u
+	}
+	`
+
+// each，逐个元素遍历
+var eachMethodText = `
+	// Each 逐个元素遍历
+	func (list {{.typName}}List) Each(f func(u {{.typNameWithPath}}, i int)) {
+		for i, single := range list {
+			f(single, i)
+		}
+	}
+	`
+
+// shuffle，洗牌
+var shuffleMethodText = `
+	// Shuffle 洗牌
+	func (list {{.typName}}List) Shuffle() {{.typName}}List {
+		r := make({{.typName}}List, len(list))
+		copy(r, list)
+		ras := rand.NewSource(time.Now().Unix())
+		ra := rand.New(ras)
+		ra.Shuffle(len(r), func(i, j int) {
+			r[i], r[j] = r[j], r[i]
+		})
+		return r
 	}
 	`
 
@@ -165,7 +202,7 @@ var joinMethodText = `
 			oMap[single.{{.joinTypField}}] = single
 		}
 
-		result := make({{.typName}}List, len(list), len(list))
+		result := make({{.typName}}List, len(list))
 		for i, single := range list {
 			tmp := f(single, oMap[single.{{.typFieldName}}])
 
@@ -192,7 +229,7 @@ var deriveMethodText = `
 			oMap[single.{{.joinTypField}}] = single
 		}
 	
-		result := make([]{{.deriveTypWithPath}}, len(list), len(list))
+		result := make([]{{.deriveTypWithPath}}, len(list))
 		for i, single := range list {
 			tmp := f(single, oMap[single.{{.typFieldName}}])
 	

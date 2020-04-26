@@ -78,7 +78,7 @@ type User struct {
 ```go
 column, 取列，ID列或Name列；签名：`func(list UserList) ColumnID() []int`
 
-map, 以列作映射；签名：`func(list UserList) MapID() map[int]User`
+mapbyxx, 以列作映射；签名：`func(list UserList) MapByID() map[int]User`
 
 slicemap/listmap, 以列作列表映射；签名：`func(list UserList) MapListByID() map[int]UserList`
 
@@ -92,7 +92,13 @@ limit, 从offset位置开始的前几个；签名：`func(list UserList) Limit(o
 
 group, 按指定条件分组，跟slicemap类似，TODO:
 
+map, 对列表里的每个元素执行指定操作，返回新的同类型元素列表；签名：`func(list UserList) Map(f func(u User) User ) UserList`
+
 reduce, 降维，从数组变为单个，对数组中的每个元素执行函数(升序执行)，将其结果汇总为单个返回值；签名：`func(list UserList) Reduce(f func(u User, nu User) User) User`
+
+each，遍历，逐个元素遍历；签名：`func (list UserList) Each(f func(u User, i int))`
+
+shuffle，洗牌；签名：`func (list UserList) Shuffle() UserList`
 
 sum, 对某列求和，可用reduce实现
 
