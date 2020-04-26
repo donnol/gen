@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"go/ast"
 	"go/types"
 	"os"
 	"path/filepath"
@@ -17,6 +18,8 @@ type Pkg struct {
 	Dir        string // 包目录
 	ImportPath string // 包导入路径
 	Structs    []Struct
+
+	typsExprMap map[types.Type]ast.Expr
 }
 
 // Struct 结构体
@@ -60,6 +63,8 @@ type Field struct {
 
 // Info 信息
 type Info struct {
+	pkg *Pkg // 所属包
+
 	Name string // 名称，如：Info
 
 	Anonymous bool // 是否匿名
@@ -215,7 +220,8 @@ func (attr Attr) GetJoinTyp(parser *Parser, pkgPath string, structs []Struct) (j
 }
 
 // InitWithTypes 初始化
-func (info *Info) InitWithTypes(name, pkgPath, doc, comment string, typ types.Type) {
+func (info *Info) InitWithTypes(pkg *Pkg, name, pkgPath, doc, comment string, typ types.Type) {
+	info.pkg = pkg
 	info.Name = name
 	info.TypesType = typ
 	info.Type = typ.String()
@@ -335,10 +341,21 @@ func (info Info) GetTypesTypeStructField(fieldName string) (
 
 // GetImportPathAndTypeName 获取导入路径和类型名称
 func (info Info) GetImportPathAndTypeName(typesType types.Type) (
-	string,
-	string,
-	string,
+	importPath string,
+	typeName string,
+	typNameWithPath string,
 ) {
+	// 从语法树的表达式获取
+	expr := info.pkg.typsExprMap[typesType]
+	selExpr, ok := expr.(*ast.SelectorExpr)
+	if ok {
+		exprstr := types.ExprString(selExpr)
+		debug("===expr: %+v, %v\n", selExpr, exprstr)
+		importPath, typeName, _ = getImportPathAndTypeName(typesType.String())
+		typNameWithPath = exprstr
+		return
+	}
+
 	return GetImportPathAndTypeNameFromTypesType(typesType)
 }
 

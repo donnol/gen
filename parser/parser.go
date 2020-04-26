@@ -89,7 +89,6 @@ func (p *Parser) ParsePkg(pkg string) (Pkg, error) {
 		Importer:                 importer.Default(),
 		DisableUnusedImportCheck: true,
 	}
-	info := types.Info{}
 
 	for pkgName, parserPkg := range pkgs {
 		result.Name = pkgName
@@ -101,17 +100,32 @@ func (p *Parser) ParsePkg(pkg string) (Pkg, error) {
 			files = append(files, file)
 		}
 
+		info := types.Info{
+			Types:      make(map[ast.Expr]types.TypeAndValue),
+			Defs:       make(map[*ast.Ident]types.Object),
+			Uses:       make(map[*ast.Ident]types.Object),
+			Implicits:  make(map[ast.Node]types.Object),
+			Selections: make(map[*ast.SelectorExpr]*types.Selection),
+			Scopes:     make(map[ast.Node]*types.Scope),
+		}
 		var typPkg *types.Package
 		typPkg, err = conf.Check(pkg, fset, files, &info)
 		if err != nil {
 			return result, errors.WithStack(err)
 		}
 
+		// NOTE:这里会不会存在相同的type，导致键冲突呢？
+		typsExprMap := make(map[types.Type]ast.Expr)
+		for expr, tv := range info.Types {
+			typsExprMap[tv.Type] = expr
+		}
+		result.typsExprMap = typsExprMap
+
 		// 获取文档和注释
 		docMap, commentMap := p.getStructDocAndComment(pkg, parserPkg)
 
 		// 遍历作用域，返回结构体信息
-		result.Structs = p.getStructFromPkgScope(typPkg, docMap, commentMap)
+		result.Structs = p.getStructInfo(&result, typPkg, info, typsExprMap, docMap, commentMap)
 	}
 
 	return result, nil
@@ -176,40 +190,89 @@ func (p *Parser) getStructDocAndCommentMapKey(typName, fieldName string) string 
 	return fmt.Sprintf("%s;%s", typName, fieldName)
 }
 
-func (p *Parser) getStructFromPkgScope(
+func (p *Parser) getStructInfo(
+	pkg *Pkg,
 	typPkg *types.Package,
+	typesInfo types.Info,
+	typsExprMap map[types.Type]ast.Expr,
 	docMap map[string]string,
 	commentMap map[string]string,
 ) []Struct {
 	var result []Struct
 
-	for _, scopeName := range typPkg.Scope().Names() {
-		// 找到对象
-		obj := typPkg.Scope().Lookup(scopeName)
-
-		// 解析对象
-		// 找出结构体
+	for ident, obj := range typesInfo.Defs {
+		exprStr := types.ExprString(ident)
+		_ = exprStr
+		if obj == nil {
+			continue
+		}
 		objType := obj.Type()
 		objStruct, ok := objType.Underlying().(*types.Struct)
 		if !ok {
 			continue
 		}
+		expr, ok := typsExprMap[objType]
+		if ok {
+			debug("==expr: %+v, %v\n", expr, types.ExprString(expr))
+		}
+		debug("===tv: %+v, %+v, %+v\n", exprStr, obj.Name(), objStruct)
 
-		// 为结果赋值
-		tmp := Struct{}
-		tmp.Info.InitWithTypes(obj.Name(), typPkg.Path(), docMap[obj.Name()], "", objType)
-		// 字段
-		for i := 0; i < objStruct.NumFields(); i++ {
-			field := objStruct.Field(i)
-			key := p.getStructDocAndCommentMapKey(obj.Name(), field.Name())
-			tmpField := Field{}
-			tmpField.Info.InitWithTypes(field.Name(), "", docMap[key], commentMap[key], field.Type())
-			tmpField.Anonymous = field.Anonymous()
-			tmp.Fields = append(tmp.Fields, tmpField)
+		result = append(result, p.getStructFromObject(pkg, obj, docMap, commentMap))
+	}
+
+	return result
+}
+
+func (p *Parser) getStructFromPkgScope(
+	pkg *Pkg,
+	scope *types.Scope,
+	docMap map[string]string,
+	commentMap map[string]string,
+) []Struct {
+	var result []Struct
+
+	for _, scopeName := range scope.Names() {
+		// 找到对象
+		obj := scope.Lookup(scopeName)
+
+		tmp := p.getStructFromObject(pkg, obj, docMap, commentMap)
+		if tmp.Name == "" {
+			continue
 		}
 
 		result = append(result, tmp)
 	}
 
 	return result
+}
+
+func (p *Parser) getStructFromObject(
+	pkg *Pkg,
+	obj types.Object,
+	docMap map[string]string,
+	commentMap map[string]string,
+) Struct {
+	tmp := Struct{}
+
+	// 解析对象
+	// 找出结构体
+	objType := obj.Type()
+	objStruct, ok := objType.Underlying().(*types.Struct)
+	if !ok {
+		return tmp
+	}
+
+	// 为结果赋值
+	tmp.Info.InitWithTypes(pkg, obj.Name(), obj.Pkg().Path(), docMap[obj.Name()], "", objType)
+	// 字段
+	for i := 0; i < objStruct.NumFields(); i++ {
+		field := objStruct.Field(i)
+		key := p.getStructDocAndCommentMapKey(obj.Name(), field.Name())
+		tmpField := Field{}
+		tmpField.Info.InitWithTypes(pkg, field.Name(), "", docMap[key], commentMap[key], field.Type())
+		tmpField.Anonymous = field.Anonymous()
+		tmp.Fields = append(tmp.Fields, tmpField)
+	}
+
+	return tmp
 }
