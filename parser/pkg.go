@@ -445,6 +445,11 @@ func GetImportPathAndTypeNameFromTypesType(typesType types.Type) (string, string
 	return importPath, typeName, typNameWithPath
 }
 
+// GetImportPathAndTypeName 解析类型获取带path类型
+func GetImportPathAndTypeName(full string) (string, string, string) {
+	return getImportPathAndTypeName(full)
+}
+
 // getImportPathAndTypeName 解析类型获取带path类型
 func getImportPathAndTypeName(full string) (string, string, string) {
 	importPath := ""

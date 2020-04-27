@@ -12,7 +12,8 @@ import (
 func TestList(t *testing.T) {
 	p := parser.New()
 	temp := &template.Template{}
-	list := New(p, temp)
+	opt := Option{UseAnnotation: true}
+	list := New(p, temp, opt)
 	for _, cas := range []struct {
 		pkg string
 	}{

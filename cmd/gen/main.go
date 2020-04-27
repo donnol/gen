@@ -75,7 +75,15 @@ func main() {
 
 				// TODO:
 				// 指定了结构体，则不需要遍历目录，解析type内容，如果有包路径则找路径内的结构体信息，如果没有包路径则直接在当前目录找结构体信息
-				// 如果还指定了field，则对field做指定操作
+				importPath, typName, typNameWithPath := parser.GetImportPathAndTypeName(typ)
+				p := parser.New()
+				t := &template.Template{}
+				opt := list.Option{}
+				l := list.New(p, t, opt)
+				fmt.Printf("=== path: %s, %s, %s\n", importPath, typName, typNameWithPath)
+				if err := l.Parse(importPath); err != nil {
+					fmt.Printf("=== parse err: %+v\n", err)
+				}
 			}
 		},
 	})
@@ -144,7 +152,8 @@ func genPkg(dir string, rFlag bool, excludeFlags []string) {
 	// 生成代码
 	p := parser.New()
 	t := &template.Template{}
-	l := list.New(p, t)
+	opt := list.Option{UseAnnotation: true}
+	l := list.New(p, t, opt)
 	var pkgNum int
 	for _, pkgPath := range allPkgPath {
 		fmt.Printf("=== parse path: %s\n", pkgPath)

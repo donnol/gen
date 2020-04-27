@@ -27,7 +27,7 @@ gen:install build
 
 # 指定类型，生成方法
 gen_spec_type:install build
-	gen list --type=github.com/donnol/gen/list/testdata1.Model \
+	gen list --type=github.com/donnol/gen/list/testdata2.Model \
 		--method='where;sort;limit;reduce;column(ID,Name,Age);map(ID,Name,Age);slicemap(ID,Name,Age);listmap(ID,Name,Age)'
 
 # 通过git log查看文件的修改时间

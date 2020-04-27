@@ -34,14 +34,22 @@ const (
 type List struct {
 	parser   *parser.Parser
 	template *template.Template
+
+	useAnnotation bool // 是否使用注解
 }
 
 // New 新建
-func New(p *parser.Parser, t *template.Template) *List {
+func New(p *parser.Parser, t *template.Template, opt Option) *List {
 	return &List{
-		parser:   p,
-		template: t,
+		parser:        p,
+		template:      t,
+		useAnnotation: opt.UseAnnotation,
 	}
+}
+
+// Option 选项
+type Option struct {
+	UseAnnotation bool // 是否使用注解
 }
 
 // Parse 解析，对输入的导入路径进行解析，生成需要的结构体和方法，再写到同目录下的特定文件内
@@ -100,7 +108,7 @@ func (list *List) output(pkg parser.Pkg) (string, parser.ImportPathMap, []byte, 
 				break
 			}
 		}
-		if singleStruct.Info.Commands.ExistCommand(commandName) ||
+		if !list.useAnnotation || singleStruct.Info.Commands.ExistCommand(commandName) ||
 			existFieldCommand {
 			for _, text := range []string{
 				typText,
