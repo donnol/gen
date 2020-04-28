@@ -36,6 +36,7 @@ type List struct {
 	template *template.Template
 
 	useAnnotation bool // 是否使用注解
+	methods       []Method
 }
 
 // New 新建
@@ -44,12 +45,19 @@ func New(p *parser.Parser, t *template.Template, opt Option) *List {
 		parser:        p,
 		template:      t,
 		useAnnotation: opt.UseAnnotation,
+		methods:       opt.Methods,
 	}
 }
 
 // Option 选项
 type Option struct {
-	UseAnnotation bool // 是否使用注解
+	UseAnnotation bool     // 是否使用注解
+	Methods       []Method // 方法
+}
+
+type Method struct {
+	Name  string
+	Attrs []string
 }
 
 // Parse 解析，对输入的导入路径进行解析，生成需要的结构体和方法，再写到同目录下的特定文件内

@@ -79,8 +79,18 @@ func main() {
 				p := parser.New()
 				t := &template.Template{}
 				opt := list.Option{}
+
+				if strings.TrimSpace(method) != "" {
+					methods := strings.Split(method, ";")
+					for _, met := range methods {
+						opt.Methods = append(opt.Methods, list.Method{
+							Name: met,
+						})
+					}
+				}
+
 				l := list.New(p, t, opt)
-				fmt.Printf("=== path: %s, %s, %s\n", importPath, typName, typNameWithPath)
+				fmt.Printf("=== path: %s, %s, %s, %+v\n", importPath, typName, typNameWithPath, opt)
 				if err := l.Parse(importPath); err != nil {
 					fmt.Printf("=== parse err: %+v\n", err)
 				}
