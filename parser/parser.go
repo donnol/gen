@@ -202,10 +202,15 @@ func (p *Parser) getStructInfo(
 
 	for ident, obj := range typesInfo.Defs {
 		exprStr := types.ExprString(ident)
-		_ = exprStr
+
 		if obj == nil {
 			continue
 		}
+		if ident.Obj != nil && ident.Obj.Kind != ast.Typ {
+			continue
+		}
+		debug("ident: %+v, %+v\n", ident, ident.Obj)
+
 		objType := obj.Type()
 		objStruct, ok := objType.Underlying().(*types.Struct)
 		if !ok {
